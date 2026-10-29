@@ -1,0 +1,1757 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AgüitaTech | Lettuce for Vegetables traceability</title>
+<meta name="description" content="AgüitaTech | Lettuce for Vegetables traceability. Batch, process and human-review records with simulated demonstration data.">
+<meta name="theme-color" content="#1f6b45">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231f6b45'/%3E%3Cpath d='M16 5c0 0-8 9-8 14a8 8 0 0 0 16 0c0-5-8-14-8-14z' fill='%23d9ecf8'/%3E%3Cpath d='M12 22c0-4 3-7 8-8-1 5-4 8-8 8z' fill='%231f6b45'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --leaf: #1f6b45;
+    --leaf-dark: #154d31;
+    --leaf-soft: #e4f0e8;
+    --water: #1d5f8c;
+    --water-dark: #164a6d;
+    --water-soft: #e3eef7;
+    --ink: #17212b;
+    --muted: #51606c;
+    --bg: #f2f5f3;
+    --surface: #ffffff;
+    --line: #d5ddd8;
+    --line-strong: #9aa8a1;
+    --amber-ink: #7a4a00;
+    --amber-bg: #fff4d9;
+    --amber-line: #e0b155;
+    --red-ink: #9b1c1c;
+    --red-bg: #fdeeee;
+    --red-line: #e5a3a3;
+    --gray-ink: #3f4a54;
+    --gray-bg: #edf0f2;
+    --demo-ink: #4a3b00;
+    --demo-bg: #fff8d6;
+    --demo-line: #d9c25a;
+    --focus: #f0a400;
+    --font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Roboto, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 var(--font); }
+  a { color: var(--water); }
+  a:hover { color: var(--water-dark); }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  [hidden] { display: none !important; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+  .skip { position: absolute; left: -9999px; top: 0; z-index: 100; background: var(--ink); color: #fff; padding: 10px 14px; }
+  .skip:focus { left: 8px; top: 8px; }
+  .id { font-variant-numeric: tabular-nums; letter-spacing: .015em; font-weight: 700; overflow-wrap: anywhere; }
+
+  /* Header */
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 30; }
+  .topbar-inner { display: flex; align-items: center; gap: 18px; min-height: 64px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); flex: none; }
+  .brand svg { width: 34px; height: 34px; flex: none; }
+  .brand-name { font-size: 1.28rem; font-weight: 750; letter-spacing: -.01em; line-height: 1.1; }
+  .brand-name span { display: block; font-size: .78rem; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+  .nav { display: flex; gap: 4px; flex: 1; }
+  .nav button {
+    font: inherit; font-size: .95rem; font-weight: 600; color: var(--muted); background: none; border: 0;
+    padding: 10px 14px; border-radius: 10px; cursor: pointer; min-height: 44px; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .nav button svg { width: 20px; height: 20px; flex: none; }
+  .nav button:hover { background: var(--leaf-soft); color: var(--leaf-dark); }
+  .nav button[aria-current="page"] { background: var(--leaf); color: #fff; }
+  .role { display: flex; align-items: center; gap: 8px; font-size: .88rem; color: var(--muted); flex: none; }
+  .role label { white-space: nowrap; font-weight: 600; }
+  .role select { width: auto; min-height: 40px; padding: 6px 10px; font-size: .92rem; }
+  body.public-mode .nav, body.public-mode .role { display: none; }
+
+  main { padding: 22px 16px 56px; }
+  main:focus { outline: none; }
+  h1 { font-size: 1.65rem; line-height: 1.2; margin: 0 0 6px; letter-spacing: -.01em; }
+  h2 { font-size: 1.18rem; line-height: 1.3; margin: 0 0 12px; }
+  h3 { font-size: 1rem; margin: 0 0 8px; }
+  p { margin: 0 0 10px; }
+  .muted { color: var(--muted); }
+  .small { font-size: .875rem; }
+  .page-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-bottom: 16px; }
+  .panel > h2:first-child { margin-top: 0; }
+  .grid-main { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 980px) { .grid-main { grid-template-columns: minmax(0, 1.85fr) minmax(300px, 1fr); align-items: start; } }
+  @media (max-width: 979px) { .grid-main > aside { order: -1; } }
+
+  /* Stats */
+  .stats { display: grid; gap: 12px; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 16px; }
+  @media (max-width: 760px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; border-top: 4px solid var(--line-strong); }
+  .stat .n { font-size: 2rem; font-weight: 750; line-height: 1.05; font-variant-numeric: tabular-nums; }
+  .stat .l { font-size: .9rem; color: var(--muted); }
+  .stat.s-incomplete { border-top-color: var(--amber-line); }
+  .stat.s-review { border-top-color: var(--water); }
+  .stat.s-hold { border-top-color: var(--red-ink); }
+  .stat.s-total { border-top-color: var(--leaf); }
+
+  /* Notices */
+  .notice { border: 1px solid; border-radius: 12px; padding: 12px 14px; margin: 0 0 14px; }
+  .notice strong { display: block; }
+  .notice ul { margin: 6px 0 0; padding-left: 20px; }
+  .n-info { background: var(--water-soft); border-color: #a9c6de; color: var(--water-dark); }
+  .n-warn { background: var(--amber-bg); border-color: var(--amber-line); color: var(--amber-ink); }
+  .n-stop { background: var(--red-bg); border-color: var(--red-line); color: var(--red-ink); }
+  .n-review { background: var(--surface); border-color: var(--line-strong); border-left: 5px solid var(--leaf); color: var(--ink); font-weight: 600; }
+  .n-public { background: var(--surface); border: 2px solid var(--ink); font-weight: 600; font-size: 1.02rem; }
+  .demo-banner { background: var(--demo-bg); border: 2px dashed var(--demo-line); color: var(--demo-ink); border-radius: 12px; padding: 10px 14px; margin: 0 0 14px; text-align: center; font-weight: 800; letter-spacing: .06em; }
+
+  /* Badges */
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 999px; border: 1px solid; font-size: .84rem; font-weight: 650; line-height: 1.35; white-space: normal; }
+  .b-draft { background: var(--gray-bg); color: var(--gray-ink); border-color: #c4ccd3; }
+  .b-incomplete { background: var(--amber-bg); color: var(--amber-ink); border-color: var(--amber-line); }
+  .b-awaiting, .b-complete { background: var(--water-soft); color: var(--water-dark); border-color: #a9c6de; }
+  .b-hold { background: var(--red-bg); color: var(--red-ink); border-color: var(--red-line); }
+  .b-disposition { background: var(--surface); color: var(--ink); border-color: var(--ink); }
+  .b-example { background: var(--demo-bg); color: var(--demo-ink); border-color: var(--demo-line); font-weight: 600; }
+
+  /* Forms */
+  label, .lbl { font-weight: 600; font-size: .93rem; }
+  .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; min-width: 0; }
+  .hint { font-size: .84rem; color: var(--muted); }
+  .req { color: var(--red-ink); }
+  input[type=text], input[type=url], input[type=date], input[type=time], input[type=datetime-local], input[type=search], select, textarea {
+    font: inherit; font-size: 1rem; color: var(--ink); background: #fff; width: 100%;
+    border: 1px solid #8d9a94; border-radius: 10px; padding: 10px 12px; min-height: 46px;
+  }
+  textarea { min-height: 84px; resize: vertical; }
+  .cols { display: grid; gap: 0 14px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+  fieldset { border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin: 0 0 14px; }
+  legend { font-weight: 700; padding: 0 6px; }
+  .check { display: flex; gap: 10px; align-items: flex-start; margin: 8px 0; }
+  .check input { width: 22px; height: 22px; margin: 1px 0 0; flex: none; accent-color: var(--leaf); }
+  .form-error:empty { display: none; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px;
+    padding: 10px 18px; border-radius: 10px; border: 1px solid var(--leaf); background: var(--leaf); color: #fff;
+    font: inherit; font-size: .97rem; font-weight: 650; cursor: pointer; text-decoration: none; text-align: center;
+  }
+  .btn:hover { background: var(--leaf-dark); border-color: var(--leaf-dark); color: #fff; }
+  .btn-alt { background: #fff; color: var(--leaf-dark); border-color: var(--line-strong); }
+  .btn-alt:hover { background: var(--leaf-soft); color: var(--leaf-dark); border-color: var(--leaf); }
+  .btn-water { background: var(--water); border-color: var(--water); }
+  .btn-water:hover { background: var(--water-dark); border-color: var(--water-dark); }
+  .btn-hold { background: #fff; color: var(--red-ink); border-color: var(--red-ink); }
+  .btn-hold:hover { background: var(--red-bg); color: var(--red-ink); border-color: var(--red-ink); }
+  .btn-sm { min-height: 40px; padding: 7px 12px; font-size: .9rem; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+  th, td { text-align: left; padding: 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  th { font-size: .85rem; color: var(--muted); font-weight: 650; background: var(--bg); }
+  tbody tr:hover { background: #f8faf9; }
+  .table-wrap { overflow-x: auto; }
+  @media (min-width: 1025px) {
+    table.cards td .id { white-space: nowrap; }
+    table.cards td[data-label="Harvest date"], table.cards .t-actions .btn { white-space: nowrap; }
+    table.cards .t-actions .actions { flex-direction: column; align-items: stretch; }
+  }
+  @media (max-width: 1024px) {
+    table.cards thead { position: absolute; left: -9999px; }
+    table.cards tr { display: block; border: 1px solid var(--line); border-radius: 12px; margin-bottom: 12px; background: #fff; padding: 6px 4px; }
+    table.cards td { display: grid; grid-template-columns: 8.6em minmax(0, 1fr); gap: 10px; border: 0; padding: 7px 10px; }
+    table.cards td::before { content: attr(data-label); font-weight: 650; color: var(--muted); font-size: .86rem; }
+    table.cards td.t-actions { grid-template-columns: 1fr; padding-top: 10px; }
+    table.cards td.t-actions::before { display: none; }
+    table.cards td.t-actions .btn { flex: 1 1 auto; }
+  }
+
+  /* Recently updated */
+  .recent { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); margin-bottom: 18px; }
+  .recent a { display: block; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; text-decoration: none; color: var(--ink); }
+  .recent a:hover { border-color: var(--leaf); background: #fbfdfc; color: var(--ink); }
+  .recent .id { display: block; color: var(--water); margin-bottom: 6px; }
+  .recent .when { display: block; font-size: .84rem; color: var(--muted); margin-top: 6px; }
+
+  /* Lists */
+  .list { list-style: none; margin: 0; padding: 0; }
+  .list li { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .list li:last-child { border-bottom: 0; }
+  .list .grow { flex: 1; min-width: 0; }
+  .flag { display: flex; gap: 10px; align-items: baseline; padding: 6px 0; }
+  .tag { flex: none; font-size: .76rem; font-weight: 700; border-radius: 6px; padding: 1px 7px; border: 1px solid; }
+  .t-missing { background: var(--amber-bg); color: var(--amber-ink); border-color: var(--amber-line); }
+  .t-review { background: var(--water-soft); color: var(--water-dark); border-color: #a9c6de; }
+  .t-hold { background: var(--red-bg); color: var(--red-ink); border-color: var(--red-line); }
+  dl.kv { display: grid; grid-template-columns: minmax(140px, 38%) minmax(0, 1fr); gap: 8px 14px; margin: 0; }
+  dl.kv dt { color: var(--muted); font-weight: 600; font-size: .92rem; }
+  dl.kv dd { margin: 0; overflow-wrap: anywhere; }
+  @media (max-width: 560px) { dl.kv { grid-template-columns: 1fr; gap: 2px; } dl.kv dd { margin-bottom: 8px; } }
+
+  /* Batch header */
+  .batch-head { display: grid; gap: 14px; }
+  .batch-id { font-size: clamp(1.45rem, 4.4vw, 2.2rem); line-height: 1.1; margin: 0; }
+  .meta { display: grid; gap: 8px 18px; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); margin: 0; }
+  .meta dt { font-size: .82rem; color: var(--muted); font-weight: 600; }
+  .meta dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+
+  /* Process strip: the water path from source to cold chain */
+  .strip { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); position: relative; }
+  .strip::before { content: ""; position: absolute; left: 8%; right: 8%; top: 17px; height: 4px; border-radius: 4px; background: linear-gradient(90deg, var(--water), var(--leaf)); opacity: .35; }
+  .strip li { position: relative; text-align: center; padding: 0 4px; }
+  .strip .dot { width: 38px; height: 38px; margin: 0 auto 8px; border-radius: 50%; display: grid; place-items: center; background: #fff; border: 3px solid var(--line-strong); color: var(--muted); font-weight: 750; font-size: .9rem; position: relative; }
+  .strip .st-recorded .dot { border-color: var(--leaf); background: var(--leaf); color: #fff; }
+  .strip .st-missing .dot { border-color: var(--amber-line); background: var(--amber-bg); color: var(--amber-ink); }
+  .strip .st-review .dot { border-color: var(--water); background: var(--water-soft); color: var(--water-dark); }
+  .strip .st-hold .dot { border-color: var(--red-ink); background: var(--red-bg); color: var(--red-ink); }
+  .strip .st-optional .dot { border-style: dashed; }
+  .strip .name { display: block; font-weight: 650; font-size: .88rem; line-height: 1.25; }
+  .strip .state { display: block; font-size: .8rem; color: var(--muted); }
+  @media (max-width: 700px) {
+    .strip { grid-template-columns: 1fr; gap: 0; }
+    .strip::before { left: 18px; right: auto; top: 10px; bottom: 10px; width: 4px; height: auto; background: linear-gradient(180deg, var(--water), var(--leaf)); }
+    .strip li { display: grid; grid-template-columns: 38px 1fr; column-gap: 12px; text-align: left; padding: 4px 0; align-items: center; }
+    .strip .dot { margin: 0; grid-row: span 2; }
+  }
+
+  /* Sections */
+  details.sec { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; margin-bottom: 10px; }
+  details.sec > summary { list-style: none; cursor: pointer; padding: 14px 16px; display: flex; gap: 10px; align-items: center; justify-content: space-between; min-height: 56px; }
+  details.sec > summary::-webkit-details-marker { display: none; }
+  details.sec > summary .t { font-weight: 700; display: flex; align-items: center; gap: 10px; }
+  details.sec > summary .t::before { content: ""; width: 9px; height: 9px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(-45deg); transition: transform .15s; flex: none; }
+  details.sec[open] > summary .t::before { transform: rotate(45deg); }
+  details.sec .body { padding: 0 16px 16px; }
+  .sstate { font-size: .84rem; color: var(--muted); text-align: right; }
+  .sstate.missing { color: var(--amber-ink); font-weight: 600; }
+  .sstate.hold { color: var(--red-ink); font-weight: 600; }
+  .note-line { font-size: .88rem; color: var(--muted); border-left: 3px solid var(--water); padding: 2px 10px; margin: 0 0 12px; }
+  .saved { font-size: .84rem; color: var(--muted); margin: 10px 0 12px; }
+
+  /* Timeline */
+  ol.tl { list-style: none; margin: 0; padding: 0; position: relative; }
+  ol.tl::before { content: ""; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 3px; background: var(--line); border-radius: 2px; }
+  ol.tl li { position: relative; padding: 0 0 14px 28px; }
+  ol.tl li::before { content: ""; position: absolute; left: 0; top: 5px; width: 17px; height: 17px; border-radius: 50%; background: #fff; border: 3px solid var(--water); box-sizing: border-box; }
+  ol.tl .ev { font-weight: 700; }
+
+  /* Public page */
+  .pub { max-width: 760px; margin: 0 auto; }
+  .pub-head { background: linear-gradient(135deg, var(--leaf) 0%, var(--water) 100%); color: #fff; border-radius: 16px; padding: 22px 20px; margin-bottom: 16px; }
+  .pub-head .k { font-size: .9rem; opacity: .9; margin: 0 0 4px; }
+  .pub-head .batch-id { color: #fff; }
+  .pub-head dl { margin: 14px 0 0; display: grid; gap: 10px 18px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+  .pub-head dt { font-size: .8rem; opacity: .85; }
+  .pub-head dd { margin: 0; font-weight: 650; }
+  .pub-rows { list-style: none; margin: 0; padding: 0; }
+  .pub-rows li { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .pub-rows li:last-child { border-bottom: 0; }
+  .pub-rows .v { font-weight: 650; text-align: right; }
+
+  /* Modal */
+  .overlay { position: fixed; inset: 0; z-index: 50; background: rgba(15, 30, 24, .55); display: flex; justify-content: center; align-items: flex-start; padding: 24px 12px; overflow-y: auto; }
+  .modal { background: #fff; border-radius: 16px; width: 100%; max-width: 540px; padding: 20px; }
+  .qr-box { display: flex; justify-content: center; margin: 12px 0; }
+  .qr-box svg { max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: 8px; }
+  .linkbox { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .8rem; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px; overflow-wrap: anywhere; max-height: 7.5em; overflow-y: auto; }
+
+  #toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 70; width: max-content; max-width: calc(100vw - 32px); }
+  #toast .msg { background: var(--ink); color: #fff; padding: 11px 16px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0, 0, 0, .22); }
+  #printArea { display: none; }
+
+  /* Small screens: bottom tab bar */
+  @media (max-width: 860px) {
+    .topbar-inner { min-height: 58px; justify-content: space-between; }
+    .nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: var(--surface); border-top: 1px solid var(--line); padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); gap: 2px; }
+    .nav button { flex: 1; flex-direction: column; gap: 2px; font-size: .74rem; padding: 6px 2px; min-height: 56px; border-radius: 10px; }
+    body:not(.public-mode) main { padding-bottom: 110px; }
+    body:not(.public-mode) #toast { bottom: 84px; }
+    .brand { flex: 1 1 auto; min-width: 0; }
+    .brand-name { font-size: 1.12rem; }
+    .brand-name span { font-size: .72rem; line-height: 1.25; }
+    .role { flex-direction: column; align-items: flex-end; gap: 2px; }
+    .role label { font-size: .72rem; }
+    .role select { min-height: 40px; padding: 4px 8px; font-size: .88rem; }
+  }
+
+  @media print {
+    .topbar, .nav, .actions, #toast, .no-print { display: none !important; }
+    body { background: #fff; }
+    main { padding: 0; }
+    .panel, .pub-head { border-color: #999; break-inside: avoid; }
+    .pub-head { background: #fff !important; color: #000; border: 2px solid #000; }
+    .pub-head .batch-id { color: #000; }
+    body.printing-qr > *:not(#printArea) { display: none !important; }
+    body.printing-qr #printArea { display: block; text-align: center; padding-top: 24px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="#/dashboard" id="brandLink" aria-label="AgüitaTech home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#1f6b45"/><path d="M16 5c0 0-8 9-8 14a8 8 0 0 0 16 0c0-5-8-14-8-14z" fill="#d9ecf8"/><path d="M12 22c0-4 3-7 8-8-1 5-4 8-8 8z" fill="#1f6b45"/></svg>
+      <span class="brand-name">AgüitaTech<span>Lettuce for Vegetables traceability</span></span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <button type="button" data-nav="dashboard"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Dashboard</button>
+      <button type="button" data-nav="register"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Register batch</button>
+      <button type="button" data-nav="public"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM18 18h3v3h-3zM14 20h1M20 14h1"/></svg>Public records</button>
+      <button type="button" data-nav="settings"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Settings</button>
+    </nav>
+    <div class="role">
+      <label for="roleSelect">Demo role</label>
+      <select id="roleSelect" aria-label="Demo role">
+        <option value="operator">Operator</option>
+        <option value="reviewer">Reviewer</option>
+      </select>
+    </div>
+  </div>
+</header>
+<main id="main" class="wrap" tabindex="-1"></main>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="modalRoot"></div>
+<div id="printArea" aria-hidden="true"></div>
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- QR code encoder (byte mode, error-correction levels L and M) ---------- */
+  var QR = (function () {
+    // Error-correction codewords per block and number of blocks, indexed by version (1-40).
+    var ECC_PER_BLOCK = {
+      L: [-1, 7, 10, 15, 20, 26, 18, 20, 24, 30, 18, 20, 24, 26, 30, 22, 24, 28, 30, 28, 28, 28, 28, 30, 30, 26, 28, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],
+      M: [-1, 10, 16, 26, 18, 24, 16, 18, 22, 22, 26, 30, 22, 22, 24, 24, 28, 28, 26, 26, 26, 26, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28]
+    };
+    var NUM_BLOCKS = {
+      L: [-1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 4, 4, 4, 4, 4, 6, 6, 6, 6, 7, 8, 8, 9, 9, 10, 12, 12, 12, 13, 14, 15, 16, 17, 18, 19, 19, 20, 21, 22, 24, 25],
+      M: [-1, 1, 1, 1, 2, 2, 4, 4, 4, 5, 5, 5, 8, 9, 9, 10, 10, 11, 13, 14, 16, 17, 17, 18, 20, 21, 23, 25, 26, 28, 29, 31, 33, 35, 37, 38, 40, 43, 45, 47, 49]
+    };
+    var FORMAT_BITS = { L: 1, M: 0 };
+
+    function rawModules(ver) {
+      var n = (16 * ver + 128) * ver + 64;
+      if (ver >= 2) {
+        var a = Math.floor(ver / 7) + 2;
+        n -= (25 * a - 10) * a - 55;
+        if (ver >= 7) n -= 36;
+      }
+      return n;
+    }
+    function dataCodewords(ver, ecl) {
+      return Math.floor(rawModules(ver) / 8) - ECC_PER_BLOCK[ecl][ver] * NUM_BLOCKS[ecl][ver];
+    }
+
+    // Arithmetic in GF(256) with the QR polynomial 0x11D.
+    function gfMul(x, y) {
+      var z = 0;
+      for (var i = 7; i >= 0; i--) {
+        z = (z << 1) ^ ((z >>> 7) * 0x11D);
+        z ^= ((y >>> i) & 1) * x;
+      }
+      return z & 0xFF;
+    }
+    function rsDivisor(degree) {
+      var r = [];
+      for (var i = 0; i < degree - 1; i++) r.push(0);
+      r.push(1);
+      var root = 1;
+      for (i = 0; i < degree; i++) {
+        for (var j = 0; j < r.length; j++) {
+          r[j] = gfMul(r[j], root);
+          if (j + 1 < r.length) r[j] ^= r[j + 1];
+        }
+        root = gfMul(root, 0x02);
+      }
+      return r;
+    }
+    function rsRemainder(data, divisor) {
+      var r = divisor.map(function () { return 0; });
+      data.forEach(function (b) {
+        var factor = b ^ r.shift();
+        r.push(0);
+        divisor.forEach(function (coef, i) { r[i] ^= gfMul(coef, factor); });
+      });
+      return r;
+    }
+
+    function utf8(text) { return Array.prototype.slice.call(new TextEncoder().encode(text)); }
+
+    function encode(text, preferred) {
+      var bytes = utf8(text);
+      var levels = preferred === 'L' ? ['L'] : ['M', 'L'];
+      var ver = 0, ecl = null;
+      for (var li = 0; li < levels.length && !ver; li++) {
+        for (var v = 1; v <= 40; v++) {
+          var bits = 4 + (v < 10 ? 8 : 16) + bytes.length * 8;
+          if (bits <= dataCodewords(v, levels[li]) * 8) {
+            // Prefer level M unless it pushes the code past version 10.
+            if (levels[li] === 'M' && levels.length > 1 && v > 10) break;
+            ver = v; ecl = levels[li]; break;
+          }
+        }
+      }
+      if (!ver) throw new Error('The link is too long for a QR code.');
+
+      // Data bits: byte mode, character count, data, terminator, padding.
+      var bb = [];
+      var put = function (val, len) { for (var i = len - 1; i >= 0; i--) bb.push((val >>> i) & 1); };
+      put(4, 4);
+      put(bytes.length, ver < 10 ? 8 : 16);
+      bytes.forEach(function (b) { put(b, 8); });
+      var cap = dataCodewords(ver, ecl) * 8;
+      put(0, Math.min(4, cap - bb.length));
+      put(0, (8 - bb.length % 8) % 8);
+      for (var pad = 0xEC; bb.length < cap; pad ^= 0xEC ^ 0x11) put(pad, 8);
+      var data = [];
+      for (var i = 0; i < bb.length; i += 8) {
+        var byte = 0;
+        for (var k = 0; k < 8; k++) byte = (byte << 1) | bb[i + k];
+        data.push(byte);
+      }
+
+      // Split into blocks, add error correction, interleave.
+      var nBlocks = NUM_BLOCKS[ecl][ver], eccLen = ECC_PER_BLOCK[ecl][ver];
+      var rawCw = Math.floor(rawModules(ver) / 8);
+      var nShort = nBlocks - rawCw % nBlocks, shortLen = Math.floor(rawCw / nBlocks);
+      var div = rsDivisor(eccLen), blocks = [];
+      for (var b = 0, off = 0; b < nBlocks; b++) {
+        var dat = data.slice(off, off + shortLen - eccLen + (b < nShort ? 0 : 1));
+        off += dat.length;
+        var blk = dat.concat(rsRemainder(dat, div));
+        if (b < nShort) blk.splice(shortLen - eccLen, 0, -1);
+        blocks.push(blk);
+      }
+      var cw = [];
+      for (i = 0; i < blocks[0].length; i++) {
+        for (b = 0; b < blocks.length; b++) if (blocks[b][i] !== -1) cw.push(blocks[b][i]);
+      }
+
+      // Build the symbol.
+      var size = ver * 4 + 17, m = [], fn = [];
+      for (i = 0; i < size; i++) { m.push(new Array(size).fill(false)); fn.push(new Array(size).fill(false)); }
+      var setF = function (x, y, dark) { m[y][x] = dark; fn[y][x] = true; };
+      for (i = 0; i < size; i++) { setF(6, i, i % 2 === 0); setF(i, 6, i % 2 === 0); }
+      var finder = function (cx, cy) {
+        for (var dy = -4; dy <= 4; dy++) for (var dx = -4; dx <= 4; dx++) {
+          var d = Math.max(Math.abs(dx), Math.abs(dy)), x = cx + dx, y = cy + dy;
+          if (x >= 0 && x < size && y >= 0 && y < size) setF(x, y, d !== 2 && d !== 4);
+        }
+      };
+      finder(3, 3); finder(size - 4, 3); finder(3, size - 4);
+      if (ver > 1) {
+        var na = Math.floor(ver / 7) + 2;
+        var step = ver === 32 ? 26 : Math.ceil((ver * 4 + 4) / (na * 2 - 2)) * 2;
+        var pos = [6];
+        for (var p = size - 7; pos.length < na; p -= step) pos.splice(1, 0, p);
+        for (i = 0; i < na; i++) for (var j = 0; j < na; j++) {
+          if ((i === 0 && j === 0) || (i === 0 && j === na - 1) || (i === na - 1 && j === 0)) continue;
+          for (var ay = -2; ay <= 2; ay++) for (var ax = -2; ax <= 2; ax++)
+            setF(pos[i] + ax, pos[j] + ay, Math.max(Math.abs(ax), Math.abs(ay)) !== 1);
+        }
+      }
+      var drawFormat = function (mask) {
+        var d = (FORMAT_BITS[ecl] << 3) | mask, r = d;
+        for (var q = 0; q < 10; q++) r = (r << 1) ^ ((r >>> 9) * 0x537);
+        var bits = ((d << 10) | r) ^ 0x5412;
+        var bit = function (n) { return ((bits >>> n) & 1) !== 0; };
+        for (var t = 0; t <= 5; t++) setF(8, t, bit(t));
+        setF(8, 7, bit(6)); setF(8, 8, bit(7)); setF(7, 8, bit(8));
+        for (t = 9; t < 15; t++) setF(14 - t, 8, bit(t));
+        for (t = 0; t < 8; t++) setF(size - 1 - t, 8, bit(t));
+        for (t = 8; t < 15; t++) setF(8, size - 15 + t, bit(t));
+        setF(8, size - 8, true);
+      };
+      drawFormat(0);
+      if (ver >= 7) {
+        var r = ver;
+        for (i = 0; i < 12; i++) r = (r << 1) ^ ((r >>> 11) * 0x1F25);
+        var vb = (ver << 12) | r;
+        for (i = 0; i < 18; i++) {
+          var vbit = ((vb >>> i) & 1) !== 0, a1 = size - 11 + i % 3, b1 = Math.floor(i / 3);
+          setF(a1, b1, vbit); setF(b1, a1, vbit);
+        }
+      }
+
+      // Place codeword bits in the zigzag pattern.
+      var idx = 0;
+      for (var right = size - 1; right >= 1; right -= 2) {
+        if (right === 6) right = 5;
+        for (var vert = 0; vert < size; vert++) {
+          for (j = 0; j < 2; j++) {
+            var x = right - j, up = ((right + 1) & 2) === 0, y = up ? size - 1 - vert : vert;
+            if (!fn[y][x] && idx < cw.length * 8) {
+              m[y][x] = ((cw[idx >>> 3] >>> (7 - (idx & 7))) & 1) !== 0;
+              idx++;
+            }
+          }
+        }
+      }
+
+      // Try all eight masks and keep the one with the lowest penalty.
+      var maskFn = [
+        function (x, y) { return (x + y) % 2 === 0; },
+        function (x, y) { return y % 2 === 0; },
+        function (x) { return x % 3 === 0; },
+        function (x, y) { return (x + y) % 3 === 0; },
+        function (x, y) { return (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0; },
+        function (x, y) { return x * y % 2 + x * y % 3 === 0; },
+        function (x, y) { return (x * y % 2 + x * y % 3) % 2 === 0; },
+        function (x, y) { return ((x + y) % 2 + x * y % 3) % 2 === 0; }
+      ];
+      var applyMask = function (k) {
+        for (var yy = 0; yy < size; yy++) for (var xx = 0; xx < size; xx++)
+          if (!fn[yy][xx] && maskFn[k](xx, yy)) m[yy][xx] = !m[yy][xx];
+      };
+      var best = 0, bestScore = Infinity;
+      for (var k = 0; k < 8; k++) {
+        applyMask(k); drawFormat(k);
+        var s = penalty(m, size);
+        if (s < bestScore) { bestScore = s; best = k; }
+        applyMask(k);
+      }
+      applyMask(best); drawFormat(best);
+      return { size: size, modules: m, version: ver, level: ecl };
+    }
+
+    function penalty(m, size) {
+      var score = 0, dark = 0, x, y;
+      var line = function (get) {
+        var run = 1, s = 0, seq = '';
+        for (var i = 0; i < size; i++) {
+          var c = get(i);
+          seq += c ? '1' : '0';
+          if (i > 0) {
+            if (c === get(i - 1)) { run++; if (run === 5) s += 3; else if (run > 5) s++; }
+            else run = 1;
+          }
+        }
+        var pad = '0000';
+        var full = pad + seq + pad;
+        for (var t = 0; t + 11 <= full.length; t++) {
+          var w = full.substr(t, 11);
+          if (w === '10111010000' || w === '00001011101') s += 40;
+        }
+        return s;
+      };
+      for (y = 0; y < size; y++) score += line(function (i) { return m[y][i]; });
+      for (x = 0; x < size; x++) score += line(function (i) { return m[i][x]; });
+      for (y = 0; y < size - 1; y++) for (x = 0; x < size - 1; x++) {
+        var c = m[y][x];
+        if (c === m[y][x + 1] && c === m[y + 1][x] && c === m[y + 1][x + 1]) score += 3;
+      }
+      for (y = 0; y < size; y++) for (x = 0; x < size; x++) if (m[y][x]) dark++;
+      var total = size * size;
+      score += (Math.ceil(Math.abs(dark * 20 - total * 10) / total) - 1) * 10;
+      return score;
+    }
+
+    function toSvg(qr, cell, label) {
+      var q = 4, dim = (qr.size + q * 2) * cell, d = '';
+      for (var y = 0; y < qr.size; y++) for (var x = 0; x < qr.size; x++)
+        if (qr.modules[y][x]) d += 'M' + (x + q) + ' ' + (y + q) + 'h1v1h-1z';
+      return '<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="' + label + '" width="' + dim + '" height="' + dim +
+        '" viewBox="0 0 ' + (qr.size + q * 2) + ' ' + (qr.size + q * 2) + '" shape-rendering="crispEdges">' +
+        '<rect width="100%" height="100%" fill="#fff"/><path fill="#000" d="' + d + '"/></svg>';
+    }
+
+    function toCanvas(qr, cell) {
+      var q = 4, dim = (qr.size + q * 2) * cell;
+      var c = document.createElement('canvas');
+      c.width = dim; c.height = dim;
+      var g = c.getContext('2d');
+      g.fillStyle = '#fff'; g.fillRect(0, 0, dim, dim);
+      g.fillStyle = '#000';
+      for (var y = 0; y < qr.size; y++) for (var x = 0; x < qr.size; x++)
+        if (qr.modules[y][x]) g.fillRect((x + q) * cell, (y + q) * cell, cell, cell);
+      return c;
+    }
+
+    return { encode: encode, toSvg: toSvg, toCanvas: toCanvas };
+  })();
+
+  /* ---------- Fixed wording ---------- */
+  var TXT = {
+    REVIEW: 'Process records require human review. This page is not a laboratory test or a safety certificate.',
+    NOTICE: 'This page displays recorded traceability and process information. It is not a laboratory test, does not confirm the absence of Cyclospora, is not a safety certificate, and is not an authenticated record.',
+    DEMO: 'SIMULATED DEMO DATA',
+    READINGS: 'Readings are process records, not pathogen tests.',
+    FILTER: 'Proposed filtration barrier. Performance requires site-specific validation.',
+    OZONE: 'Optional ozone treatment of process water. Settings are recorded for traceability only.',
+    SUSTAIN: 'Recorded operational data only. No savings are calculated.',
+    ROLE: 'The role selector is a demonstration control. It is not authentication or security.',
+    STORAGE: 'Prototype storage: records are saved only in this browser. This is not a shared production database.',
+    CHECKS: 'Documentation checks only. A reviewer makes every decision.',
+    PUBLIC_STEPS: 'These entries show whether a step was recorded. They are not laboratory results.',
+    CLAIM: 'Describe what was observed. This entry contains a product claim that cannot be recorded.'
+  };
+
+  var S = {
+    DRAFT: 'Draft',
+    INCOMPLETE: 'Incomplete',
+    AWAITING: 'Awaiting review',
+    HOLD: 'Hold—review required',
+    COMPLETE: 'Record complete—review pending',
+    DISPOSITION: 'Process disposition recorded'
+  };
+  var STATUS_LIST = [S.DRAFT, S.INCOMPLETE, S.AWAITING, S.HOLD, S.COMPLETE, S.DISPOSITION];
+  var STATUS_CLASS = {};
+  STATUS_CLASS[S.DRAFT] = 'b-draft';
+  STATUS_CLASS[S.INCOMPLETE] = 'b-incomplete';
+  STATUS_CLASS[S.AWAITING] = 'b-awaiting';
+  STATUS_CLASS[S.HOLD] = 'b-hold';
+  STATUS_CLASS[S.COMPLETE] = 'b-complete';
+  STATUS_CLASS[S.DISPOSITION] = 'b-disposition';
+
+  // Public (neutral) process-review labels
+  var PUB_KEYS = ['incomplete', 'review', 'hold', 'disposition'];
+  var PUB_LABEL = { incomplete: 'Information incomplete', review: 'Review pending', hold: 'Hold—review required', disposition: 'Process disposition recorded' };
+  var PUB_CLASS = { incomplete: 'b-incomplete', review: 'b-awaiting', hold: 'b-hold', disposition: 'b-disposition' };
+  var USED_L = ['Not recorded', 'Used', 'Not used'], DONE_L = ['Not recorded', 'Completed', 'Not completed'], REC_L = ['Not recorded', 'Recorded'];
+
+  var ACTIONS = {
+    'continue': { button: 'Continue under review', done: 'Continued under review' },
+    hold: { button: 'Place on hold', done: 'Placed on hold' },
+    escalate: { button: 'Escalate for investigation', done: 'Escalated for investigation' },
+    disposition: { button: 'Record disposition', done: 'Disposition recorded' }
+  };
+  var ROLE_LABEL = { operator: 'Operator', reviewer: 'Reviewer' };
+  var EVENT_TYPES = ['Harvest', 'Cooling', 'Washing', 'Packing', 'Transfer'];
+
+  var DATA_KEY = 'lettuce-records.v1';
+  var ROLE_KEY = 'lettuce-records.role';
+  var SETTINGS_KEY = 'lettuce-records.settings';
+  var DEMO_ID = 'LETTUCE-20261020-DEMO';
+  var TITLE = 'AgüitaTech | Lettuce for Vegetables traceability';
+  var REQUIRED_EVENTS = ['Harvest', 'Cooling', 'Washing', 'Packing'];
+  var ID_RE = /^[A-Z0-9][A-Z0-9-]{2,39}$/;
+
+  // Entries may not contain safety, approval or certification claims.
+  var CLAIMS = [
+    /\bsafe\b/i,
+    /\b(pathogen|cyclospora|parasite|bacteria|contamination)[\s-]*free\b/i,
+    /\bcertified\b/i,
+    /\bguaranteed\b/i,
+    /\bapproved\b/i,
+    /\bcompliant\b/i
+  ];
+
+  /* ---------- Record sections ---------- */
+  var YNU = [['', 'Select'], ['yes', 'Yes'], ['no', 'No'], ['unknown', 'Unknown']];
+  var SECTIONS = [
+    { key: 'water', title: 'Water assessment', short: 'Water', fields: [
+      { k: 'source', label: 'Water source type', type: 'select', req: true, opts: [['', 'Select'], ['surface', 'Surface water'], ['ground', 'Groundwater'], ['public', 'Public supply'], ['reclaimed', 'Reclaimed water'], ['unknown', 'Unknown']] },
+      { k: 'date', label: 'Assessment date', type: 'date', req: true },
+      { k: 'risk', label: 'Water-risk notes', type: 'textarea' },
+      { k: 'weather', label: 'Weather or flooding concern', type: 'select', req: true, opts: YNU },
+      { k: 'decision', label: 'Water-use decision', type: 'select', req: true, opts: [['', 'Select'], ['permitted', 'Permitted for this demonstration'], ['mitigation', 'Mitigation required'], ['stopped', 'Stopped pending review'], ['unknown', 'Unknown']] },
+      { k: 'review', label: 'Review status', type: 'select', opts: [['', 'Not recorded'], ['reviewed', 'Reviewed'], ['pending', 'Pending review'], ['unknown', 'Unknown']] }
+    ] },
+    { key: 'pretreatment', title: 'Pretreatment', short: 'Pretreatment', fields: [
+      { k: 'used', label: 'Pretreatment used', type: 'select', req: true, opts: YNU },
+      { k: 'desc', label: 'Description', type: 'textarea' },
+      { k: 'sediment', label: 'Sediment or turbidity-control notes', type: 'textarea' },
+      { k: 'date', label: 'Date', type: 'date' },
+      { k: 'operator', label: 'Operator', type: 'text' }
+    ] },
+    { key: 'filtration', title: 'Filtration', short: 'Filtration', note: 'FILTER', fields: [
+      { k: 'used', label: 'Filtration used', type: 'select', req: true, opts: YNU },
+      { k: 'type', label: 'Filtration type', type: 'text' },
+      { k: 'module', label: 'Filter or module ID', type: 'text' },
+      { k: 'flow', label: 'Flow rate', type: 'text', ph: 'e.g. 180 L/min' },
+      { k: 'pressure', label: 'Pressure or differential pressure', type: 'text', ph: 'e.g. 35 kPa' },
+      { k: 'turbBefore', label: 'Turbidity before treatment', type: 'text', ph: 'e.g. 12 NTU' },
+      { k: 'turbAfter', label: 'Turbidity after treatment', type: 'text', ph: 'e.g. 3 NTU' },
+      { k: 'integrity', label: 'Integrity-check status', type: 'select', req: true, opts: [['', 'Select'], ['passed', 'Passed'], ['failed', 'Failed'], ['not_performed', 'Not performed'], ['unknown', 'Unknown']] },
+      { k: 'maintenance', label: 'Maintenance or replacement notes', type: 'textarea' }
+    ] },
+    { key: 'ozone', title: 'Ozone process-water record (optional)', short: 'Ozone', note: 'OZONE', fields: [
+      { k: 'used', label: 'Ozone treatment used', type: 'select', req: true, opts: YNU },
+      { k: 'conc', label: 'Ozone concentration, if recorded', type: 'text', ph: 'e.g. 1.0 mg/L' },
+      { k: 'contact', label: 'Treatment time', type: 'text', ph: 'e.g. 4 min' },
+      { k: 'ph', label: 'Water pH', type: 'text' },
+      { k: 'temp', label: 'Water temperature', type: 'text', ph: 'e.g. 4 °C' },
+      { k: 'method', label: 'Monitoring method', type: 'text' },
+      { k: 'operator', label: 'Operator', type: 'text' },
+      { k: 'notes', label: 'Notes', type: 'textarea' }
+    ] },
+    { key: 'wash', title: 'Washing and cooling', short: 'Wash and cool', fields: [
+      { k: 'when', label: 'Date and time', type: 'datetime-local', req: true },
+      { k: 'source', label: 'Linked water source', type: 'text' },
+      { k: 'step', label: 'Washing or cooling completed', type: 'select', req: true, opts: [['', 'Select'], ['yes', 'Yes'], ['no', 'No']] },
+      { k: 'temp', label: 'Water temperature', type: 'text', ph: 'e.g. 3 °C' },
+      { k: 'cross', label: 'Cross-contamination-control notes', type: 'textarea' },
+      { k: 'operator', label: 'Operator', type: 'text' }
+    ] },
+    { key: 'cold', title: 'Cold chain and quality', short: 'Cold chain', fields: [
+      { k: 'cooling', label: 'Cooling completed', type: 'select', req: true, opts: YNU },
+      { k: 'storage', label: 'Storage temperature', type: 'text', ph: 'e.g. 2 °C' },
+      { k: 'appearance', label: 'Appearance observation', type: 'text' },
+      { k: 'texture', label: 'Texture or crispness observation', type: 'text' },
+      { k: 'damage', label: 'Damage or spoilage notes', type: 'textarea' },
+      { k: 'reviewer', label: 'Quality reviewer', type: 'text' }
+    ] },
+    { key: 'sustain', title: 'Operational sustainability records (optional)', short: 'Sustainability', optional: true, note: 'SUSTAIN', fields: [
+      { k: 'waterVol', label: 'Water volume used', type: 'text', ph: 'e.g. 2,400 L' },
+      { k: 'reuse', label: 'Water-recovery plan documented', type: 'select', opts: YNU },
+      { k: 'filterRec', label: 'Filter cleaning or replacement record', type: 'textarea' },
+      { k: 'waste', label: 'Waste-handling record', type: 'textarea' },
+      { k: 'energy', label: 'Energy or equipment note', type: 'textarea' }
+    ] }
+  ];
+  var SEC = {};
+  SECTIONS.forEach(function (d) { SEC[d.key] = d; });
+  var STRIP = ['water', 'pretreatment', 'filtration', 'ozone', 'wash', 'cold'];
+
+  var READING_FIELDS = [
+    { k: 'time', label: 'Date and time', type: 'datetime-local', req: true },
+    { k: 'ph', label: 'pH', type: 'text' },
+    { k: 'turbidity', label: 'Turbidity', type: 'text', ph: 'e.g. 3 NTU' },
+    { k: 'ozone', label: 'Ozone concentration', type: 'text', ph: 'e.g. 1.0 mg/L' },
+    { k: 'temp', label: 'Temperature', type: 'text', ph: 'e.g. 4 °C' },
+    { k: 'flow', label: 'Flow', type: 'text' },
+    { k: 'pressure', label: 'Pressure', type: 'text' },
+    { k: 'duration', label: 'Treatment time', type: 'text' },
+    { k: 'operator', label: 'Operator', type: 'text' }
+  ];
+  var READING_COLS = [['time', 'Time'], ['ph', 'pH'], ['turbidity', 'Turbidity'], ['ozone', 'Ozone'], ['temp', 'Temperature'], ['flow', 'Flow'], ['pressure', 'Pressure'], ['duration', 'Treatment time'], ['operator', 'Operator']];
+
+  /* ---------- Helpers ---------- */
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function hasClaim(s) { return CLAIMS.some(function (r) { return r.test(String(s || '')); }); }
+  function scrub(s) { s = String(s == null ? '' : s); return hasClaim(s) ? '[removed]' : s; }
+  function clip(s, n) { s = String(s == null ? '' : s).trim(); return s.length > n ? s.slice(0, n - 1) + '…' : s; }
+  function nowISO() { return new Date().toISOString(); }
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function todayLocal() { var d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+  function fmtLocal(s) { return s ? String(s).replace('T', ' ') : ''; }
+  function fmtStamp(iso) {
+    if (!iso) return 'Not recorded';
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return 'Not recorded';
+    try { return d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }); } catch (e) { return d.toLocaleString(); }
+  }
+  function uid() {
+    try { var a = new Uint32Array(2); crypto.getRandomValues(a); return a[0].toString(36) + a[1].toString(36); }
+    catch (e) { return Math.random().toString(36).slice(2) + Date.now().toString(36); }
+  }
+  function optLabel(f, v) {
+    if (!f.opts) return v;
+    for (var i = 0; i < f.opts.length; i++) if (f.opts[i][0] === v) return f.opts[i][1];
+    return v;
+  }
+  function shown(v) { return (v === undefined || v === null || String(v).trim() === '') ? 'Not recorded' : v; }
+  function regionText(l) { return [l.region, l.country].filter(Boolean).join(', '); }
+  function downloadBlob(blob, name) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1500);
+  }
+
+  /* ---------- State and storage ---------- */
+  var params = new URLSearchParams(location.search);
+  var PUBLIC_MODE = params.has('batch');
+  var storageOK = true, fromStorage = false;
+  var state = null, settings = { publicBase: '' }, role = 'operator';
+  var dash = { q: '', status: '' };
+  var ui = { open: {}, editing: {} };
+
+  function readJSON(key) {
+    try { var raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : null; }
+    catch (e) { storageOK = false; return null; }
+  }
+  function writeJSON(key, val) {
+    try { localStorage.setItem(key, JSON.stringify(val)); return true; }
+    catch (e) { storageOK = false; return false; }
+  }
+  function save() {
+    if (PUBLIC_MODE) return;
+    if (!writeJSON(DATA_KEY, state)) toast('Changes could not be saved in this browser. See Settings.');
+  }
+  function log(id, text) {
+    state.activity.unshift({ t: nowISO(), role: ROLE_LABEL[role], id: id || '', text: text });
+    if (state.activity.length > 200) state.activity.length = 200;
+  }
+  function getBatch(id) { return state.batches[id] || null; }
+  function allBatches() {
+    return Object.keys(state.batches).map(function (k) { return state.batches[k]; })
+      .sort(function (a, b) { return String(b.updatedAt).localeCompare(String(a.updatedAt)); });
+  }
+  function touchRecords(b) { var t = nowISO(); b.updatedAt = t; b.recordsUpdatedAt = t; }
+
+  /* ---------- Demonstration records (simulated) ---------- */
+  function seed() {
+    var op = 'Operator';
+    var complete = {
+      id: DEMO_ID, demo: 'Complete example',
+      producer: 'Demo Farm A', region: 'Demo Valley', country: 'Demo Country', crop: 'Iceberg lettuce', variety: 'Demo variety',
+      harvestDate: '2026-10-20', harvestTime: '06:30', block: 'Block 7', quantity: '1,200 kg', enteredBy: 'Farm operator (demo)',
+      notes: 'Simulated batch showing a full set of records.', ozonePlanned: true, harvestReview: 'complete',
+      createdAt: '2026-10-20T14:00:00.000Z', updatedAt: '2026-10-21T13:00:00.000Z', recordsUpdatedAt: '2026-10-21T13:00:00.000Z',
+      records: {
+        water: { source: 'surface', date: '2026-10-18', risk: 'Canal-fed holding pond; no flooding observed this week (simulated).', weather: 'no', decision: 'permitted', review: 'reviewed', savedAt: '2026-10-18T17:00:00.000Z', savedBy: op },
+        pretreatment: { used: 'yes', desc: 'Settling basin and screen filter (simulated).', sediment: 'Screen cleaned before shift (simulated).', date: '2026-10-19', operator: 'Operator (demo)', savedAt: '2026-10-19T15:00:00.000Z', savedBy: op },
+        filtration: { used: 'yes', type: 'Media filter (proposed)', module: 'FM-01', flow: '180 L/min (simulated)', pressure: '35 kPa differential (simulated)', turbBefore: '12 NTU (simulated)', turbAfter: '3 NTU (simulated)', integrity: 'passed', maintenance: 'Backwash water sent to holding tank (simulated).', savedAt: '2026-10-20T15:00:00.000Z', savedBy: op },
+        ozone: { used: 'yes', conc: '1.0 mg/L (simulated)', contact: '4 min (simulated)', ph: '6.8 (simulated)', temp: '4 °C (simulated)', method: 'Dissolved-ozone probe (simulated)', operator: 'Operator (demo)', notes: 'Process water only.', savedAt: '2026-10-20T16:10:00.000Z', savedBy: op },
+        wash: { when: '2026-10-20T09:15', source: 'Treated process water (simulated)', step: 'yes', temp: '3 °C (simulated)', cross: 'Wash water changed at shift start; batches kept separate (simulated).', operator: 'Operator (demo)', savedAt: '2026-10-20T16:20:00.000Z', savedBy: op },
+        cold: { cooling: 'yes', storage: '2 °C (simulated)', appearance: 'Uniform color, no browning (simulated)', texture: 'Crisp (simulated)', damage: 'None noted (simulated)', reviewer: 'Quality lead (demo)', savedAt: '2026-10-20T18:00:00.000Z', savedBy: op },
+        sustain: { waterVol: '2,400 L (simulated)', reuse: 'yes', filterRec: 'Backwash on 2026-10-20 (simulated)', waste: 'Backwash solids collected for disposal (simulated)', energy: 'Pump 2.2 kW (simulated)', savedAt: '2026-10-20T18:05:00.000Z', savedBy: op }
+      },
+      readings: [
+        { id: 'r1', time: '2026-10-20T08:00', ph: '6.8', turbidity: '3 NTU', ozone: '1.0 mg/L', temp: '4 °C', flow: '180 L/min', pressure: '35 kPa', duration: '4 min', operator: 'Operator (demo)' },
+        { id: 'r2', time: '2026-10-20T10:00', ph: '6.9', turbidity: '4 NTU', ozone: '0.9 mg/L', temp: '4 °C', flow: '175 L/min', pressure: '38 kPa', duration: '4 min', operator: 'Operator (demo)' }
+      ],
+      events: [
+        { id: 'e1', type: 'Cooling', what: 'Field heat removed', who: 'Cooling operator', when: '2026-10-20T08:00', where: 'Demo Valley cooler', review: 'complete' },
+        { id: 'e2', type: 'Washing', what: 'Washed in treated process water', who: 'Processing operator', when: '2026-10-20T09:15', where: 'Demo Valley packhouse', review: 'complete' },
+        { id: 'e3', type: 'Packing', what: 'Packed into labeled cases', who: 'Packing lead', when: '2026-10-20T10:00', where: 'Demo Valley packhouse', review: 'complete' },
+        { id: 'e4', type: 'Transfer', what: 'Shipped to demo distribution center', who: 'Shipping clerk', when: '2026-10-21T05:30', where: 'Demo Valley packhouse', review: 'complete' }
+      ],
+      review: []
+    };
+    var missing = {
+      id: 'LETTUCE-20261021-MISS', demo: 'Missing-information example',
+      producer: 'Demo Farm B', region: 'Demo Valley', country: 'Demo Country', crop: 'Iceberg lettuce', variety: '',
+      harvestDate: '2026-10-21', harvestTime: '', block: 'Block 2', quantity: '', enteredBy: 'Farm operator (demo)',
+      notes: 'Filtration, ozone and quality records not yet entered.', ozonePlanned: true, harvestReview: 'pending',
+      createdAt: '2026-10-21T14:00:00.000Z', updatedAt: '2026-10-21T18:00:00.000Z', recordsUpdatedAt: '2026-10-21T18:00:00.000Z',
+      records: {
+        water: { source: 'ground', date: '2026-10-19', risk: 'Well head inspected (simulated).', weather: 'no', decision: 'permitted', review: 'pending', savedAt: '2026-10-19T17:00:00.000Z', savedBy: op },
+        wash: { when: '2026-10-21T10:00', source: 'Well water (simulated)', step: 'yes', temp: '', cross: '', operator: 'Operator (demo)', savedAt: '2026-10-21T16:00:00.000Z', savedBy: op },
+        cold: { cooling: 'yes', storage: '', appearance: '', texture: '', damage: '', reviewer: '', savedAt: '2026-10-21T18:00:00.000Z', savedBy: op }
+      },
+      readings: [],
+      events: [{ id: 'e1', type: 'Cooling', what: 'Field heat removed', who: 'Cooling operator', when: '2026-10-21T09:00', where: 'Demo Valley cooler', review: 'pending' }],
+      review: []
+    };
+    var hold = {
+      id: 'LETTUCE-20261022-HOLD', demo: 'Hold-for-review example',
+      producer: 'Demo Farm C', region: 'Demo Valley', country: 'Demo Country', crop: 'Iceberg lettuce', variety: 'Demo variety',
+      harvestDate: '2026-10-22', harvestTime: '07:00', block: 'Block 4', quantity: '900 kg', enteredBy: 'Farm operator (demo)',
+      notes: 'Filter integrity check failed.', ozonePlanned: false, harvestReview: 'complete',
+      createdAt: '2026-10-22T14:00:00.000Z', updatedAt: '2026-10-22T20:00:00.000Z', recordsUpdatedAt: '2026-10-22T18:30:00.000Z',
+      records: {
+        water: { source: 'surface', date: '2026-10-20', risk: 'Drainage ditch near pump intake (simulated).', weather: 'yes', decision: 'mitigation', review: 'reviewed', savedAt: '2026-10-20T17:00:00.000Z', savedBy: op },
+        pretreatment: { used: 'yes', desc: 'Screen filter (simulated).', sediment: '', date: '2026-10-21', operator: 'Operator (demo)', savedAt: '2026-10-21T15:00:00.000Z', savedBy: op },
+        filtration: { used: 'yes', type: 'Media filter (proposed)', module: 'FM-02', flow: '160 L/min (simulated)', pressure: '62 kPa differential (simulated)', turbBefore: '25 NTU (simulated)', turbAfter: '19 NTU (simulated)', integrity: 'failed', maintenance: 'Pressure rise after restart; inspection scheduled (simulated).', savedAt: '2026-10-22T16:00:00.000Z', savedBy: op },
+        wash: { when: '2026-10-22T10:30', source: 'Process water (simulated)', step: 'yes', temp: '4 °C (simulated)', cross: 'Batch kept separate (simulated).', operator: 'Operator (demo)', savedAt: '2026-10-22T17:00:00.000Z', savedBy: op },
+        cold: { cooling: 'yes', storage: '2 °C (simulated)', appearance: 'No browning (simulated)', texture: 'Crisp (simulated)', damage: 'None noted (simulated)', reviewer: 'Quality lead (demo)', savedAt: '2026-10-22T18:30:00.000Z', savedBy: op }
+      },
+      readings: [],
+      events: [{ id: 'e1', type: 'Cooling', what: 'Field heat removed', who: 'Cooling operator', when: '2026-10-22T09:00', where: 'Demo Valley cooler', review: 'complete' }],
+      review: [{ id: 'v1', action: 'hold', reviewerRole: 'Reviewer (demo)', reviewerName: '', note: 'Filter integrity check failed after restart. Batch held for investigation.', disposition: '', time: '2026-10-22T20:00:00.000Z', openItems: 3 }]
+    };
+    var batches = {};
+    [complete, missing, hold].forEach(function (b) { batches[b.id] = b; });
+    return {
+      version: 1, batches: batches,
+      activity: [
+        { t: '2026-10-22T20:00:00.000Z', role: 'Reviewer', id: hold.id, text: 'Placed on hold' },
+        { t: '2026-10-22T18:30:00.000Z', role: 'Operator', id: hold.id, text: 'Saved cold chain and quality' },
+        { t: '2026-10-21T18:00:00.000Z', role: 'Operator', id: missing.id, text: 'Saved cold chain and quality' },
+        { t: '2026-10-21T13:00:00.000Z', role: 'Operator', id: complete.id, text: 'Added transfer event' }
+      ]
+    };
+  }
+
+  /* ---------- Timeline ---------- */
+  function timeline(b) {
+    var list = [];
+    if (b.harvestDate) {
+      list.push({ id: 'harvest', type: 'Harvest', what: 'Harvest recorded at registration', who: b.enteredBy || '',
+        when: b.harvestDate + (b.harvestTime ? 'T' + b.harvestTime : ''), where: regionText(b),
+        review: b.harvestReview === 'complete' ? 'complete' : 'pending', fixed: true });
+    }
+    (b.events || []).forEach(function (e) { list.push(e); });
+    return list.sort(function (x, y) { return String(x.when).localeCompare(String(y.when)); });
+  }
+
+  /* ---------- Process checks (reminders for the reviewer, not a safety decision) ---------- */
+  function evaluate(b) {
+    var flags = [];
+    function add(type, sec, text) { flags.push({ type: type, sec: sec, text: text }); }
+    var r = b.records || {};
+
+    if (!b.id) add('missing', 'batch', 'Batch ID missing');
+    if (!b.harvestDate) add('missing', 'batch', 'Harvest date missing');
+
+    if (!r.water) add('missing', 'water', 'Water assessment not recorded');
+    else {
+      if (!r.water.decision) add('missing', 'water', 'Water-use decision not recorded');
+      if (!r.water.review) add('missing', 'water', 'Water review status not recorded');
+      else if (r.water.review === 'pending') add('review', 'water', 'Water assessment awaiting review');
+      if (r.water.decision === 'stopped') add('hold', 'water', 'Water use stopped pending review');
+      else if (r.water.decision === 'mitigation') add('review', 'water', 'Water mitigation required');
+      if (r.water.weather === 'yes') add('review', 'water', 'Weather or flooding concern noted');
+    }
+
+    if (!r.filtration) add('missing', 'filtration', 'Filtration record not recorded');
+    else {
+      if (!r.filtration.used) add('missing', 'filtration', 'Filtration use not recorded');
+      if (r.filtration.used === 'no') add('review', 'filtration', 'Filtration marked as not used');
+      if (r.filtration.used === 'yes') {
+        if (!r.filtration.type) add('missing', 'filtration', 'Filtration type not recorded');
+        if (!r.filtration.module) add('missing', 'filtration', 'Filter or module ID not recorded');
+      }
+      if (r.filtration.integrity === 'failed') add('hold', 'filtration', 'Filter integrity check failed');
+      else if (r.filtration.integrity === 'not_performed') add('review', 'filtration', 'Filter integrity check not performed');
+      else if (!r.filtration.integrity) add('missing', 'filtration', 'Filter integrity check not recorded');
+    }
+
+    if (b.ozonePlanned && !r.ozone) add('missing', 'ozone', 'Ozone selected for this batch but not recorded');
+    if (r.ozone) {
+      if (!r.ozone.used) add('missing', 'ozone', 'Ozone treatment use not recorded');
+      if (r.ozone.used === 'yes') {
+        if (!r.ozone.conc) add('missing', 'ozone', 'Ozone concentration not recorded');
+        if (!r.ozone.contact) add('missing', 'ozone', 'Ozone treatment time not recorded');
+      }
+      if (b.ozonePlanned && r.ozone.used === 'no') add('review', 'ozone', 'Ozone selected for this batch but recorded as not used');
+    }
+
+    if (!r.wash) add('missing', 'wash', 'Washing and cooling record not recorded');
+    else {
+      if (!r.wash.step) add('missing', 'wash', 'Washing or cooling status not recorded');
+      else if (r.wash.step === 'no') add('review', 'wash', 'Washing or cooling marked not completed');
+      if (!r.wash.when) add('missing', 'wash', 'Washing or cooling date and time not recorded');
+    }
+
+    if (!r.cold) add('missing', 'cold', 'Cold chain and quality record not recorded');
+    else {
+      if (!r.cold.cooling) add('missing', 'cold', 'Cooling status not recorded');
+      if (!r.cold.storage) add('missing', 'cold', 'Storage temperature not recorded');
+      if (!r.cold.appearance && !r.cold.texture) add('missing', 'cold', 'Quality observations not recorded');
+      if (r.cold.cooling === 'no') add('review', 'cold', 'Cooling marked not completed');
+    }
+
+    SECTIONS.forEach(function (d) {
+      var rec = r[d.key];
+      if (!rec || d.optional) return;
+      d.fields.forEach(function (f) {
+        if (f.type === 'select' && rec[f.k] === 'unknown') add('unknown', d.key, d.short + ': ' + f.label.toLowerCase() + ' marked Unknown');
+      });
+    });
+
+    var types = timeline(b).map(function (e) { return e.type; });
+    REQUIRED_EVENTS.forEach(function (t) { if (types.indexOf(t) < 0) add('missing', 'events', t + ' event not recorded'); });
+    var pending = timeline(b).filter(function (e) { return e.review !== 'complete'; }).length;
+    if (pending) add('review', 'events', pending + (pending === 1 ? ' event awaits' : ' events await') + ' review');
+
+    var acts = b.review || [];
+    var last = acts.length ? acts[acts.length - 1] : null;
+    var changedAfter = !!(last && last.action === 'disposition' && b.recordsUpdatedAt > last.time);
+    if (changedAfter) add('hold', 'review', 'Records changed after the disposition; review again');
+
+    var hasRecords = Object.keys(r).length > 0 || (b.events || []).length > 0 || (b.readings || []).length > 0;
+    var has = function (t) { return flags.some(function (f) { return f.type === t; }); };
+    var status;
+    if (last && last.action === 'disposition' && !changedAfter) status = S.DISPOSITION;
+    else if (changedAfter || has('hold') || (last && (last.action === 'hold' || last.action === 'escalate'))) status = S.HOLD;
+    else if (!hasRecords) status = S.DRAFT;
+    else if (has('missing') || has('unknown')) status = S.INCOMPLETE;
+    else if (has('review')) status = S.AWAITING;
+    else status = S.COMPLETE;
+
+    return {
+      flags: flags, status: status, last: last, changedAfter: changedAfter,
+      missingCount: flags.filter(function (f) { return f.type === 'missing' || f.type === 'unknown'; }).length
+    };
+  }
+  function publicKey(status) {
+    if (status === S.DRAFT || status === S.INCOMPLETE) return 'incomplete';
+    if (status === S.HOLD) return 'hold';
+    if (status === S.DISPOSITION) return 'disposition';
+    return 'review';
+  }
+  function sectionState(b, ev, key) {
+    var rec = (b.records || {})[key];
+    var fl = ev.flags.filter(function (f) { return f.sec === key; });
+    if (fl.some(function (f) { return f.type === 'hold'; })) return { cls: 'hold', text: 'Hold' };
+    if (fl.some(function (f) { return f.type === 'missing' || f.type === 'unknown'; })) return { cls: 'missing', text: rec ? 'Information missing' : 'Not recorded' };
+    if (fl.some(function (f) { return f.type === 'review'; })) return { cls: 'review', text: 'Needs review' };
+    if (rec) return { cls: 'recorded', text: 'Recorded' };
+    if (key === 'pretreatment' || key === 'sustain' || (key === 'ozone' && !b.ozonePlanned)) return { cls: 'optional', text: 'Not recorded' };
+    return { cls: 'missing', text: 'Not recorded' };
+  }
+
+  /* ---------- Public view and QR snapshot ---------- */
+  // 0 = not recorded, 1 = yes (used / completed), 2 = no (not used / not completed)
+  function yesNo(rec, k) { return !rec ? 0 : rec[k] === 'yes' ? 1 : rec[k] === 'no' ? 2 : 0; }
+  function publicView(b) {
+    var ev = evaluate(b), r = b.records || {};
+    return {
+      id: b.id, cr: clip(b.crop, 40), va: clip(b.variety, 40), rg: clip(b.region, 40), co: clip(b.country, 40),
+      hd: b.harvestDate || '', st: publicKey(ev.status), lu: b.updatedAt || '',
+      tr: { w: r.water ? 1 : 0, p: yesNo(r.pretreatment, 'used'), f: yesNo(r.filtration, 'used'), o: yesNo(r.ozone, 'used'), wc: yesNo(r.wash, 'step'), cc: r.cold ? 1 : 0 },
+      tl: timeline(b).slice(0, 10).map(function (e) {
+        return { t: EVENT_TYPES.indexOf(e.type), d: e.when, r: e.review === 'complete' ? 1 : 0 };
+      }),
+      demo: b.demo ? 1 : 0, g: nowISO()
+    };
+  }
+  function b64urlEncode(str) {
+    var bytes = new TextEncoder().encode(str), bin = '';
+    for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function b64urlDecode(s) {
+    s = String(s).replace(/-/g, '+').replace(/_/g, '/');
+    while (s.length % 4) s += '=';
+    var bin = atob(s), bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder().decode(bytes);
+  }
+  function minute(iso) { return iso ? String(iso).slice(0, 16) + 'Z' : ''; }
+  // Snapshot = [2, crop, variety, region, country, harvestDate, status, lastUpdate, process steps, timeline, demo, createdAt]
+  // Only public fields: no producer, address, block, notes, operator or reviewer names, readings or comments.
+  function encodeSnapshot(v) {
+    var t = v.tr;
+    return [2, v.cr, v.va, v.rg, v.co, v.hd, PUB_KEYS.indexOf(v.st), minute(v.lu), '' + t.w + t.p + t.f + t.o + t.wc + t.cc,
+      v.tl.map(function (e) { return [e.t, e.d, e.r]; }), v.demo, minute(v.g)];
+  }
+  // The snapshot comes from a link anyone can edit, so every value is checked.
+  function decodeSnapshot(d, id) {
+    try {
+      if (!d || d.length > 3000 || !ID_RE.test(id)) return null;
+      var a = JSON.parse(b64urlDecode(d));
+      if (!Array.isArray(a) || a[0] !== 2) return null;
+      var str = function (x, n) { return typeof x === 'string' ? clip(x, n) : ''; };
+      var int = function (x, max) { return (typeof x === 'number' && x >= 0 && x <= max && Math.floor(x) === x) ? x : -1; };
+      var steps = /^[01][0-2]{4}[01]$/.test(a[8] || '') ? a[8] : '000000';
+      var st = int(a[6], PUB_KEYS.length - 1);
+      return {
+        id: id, cr: str(a[1], 40), va: str(a[2], 40), rg: str(a[3], 40), co: str(a[4], 40),
+        hd: /^\d{4}-\d{2}-\d{2}$/.test(a[5] || '') ? a[5] : '',
+        st: st >= 0 ? PUB_KEYS[st] : 'review', lu: str(a[7], 24), g: str(a[11], 24),
+        tr: { w: +steps[0], p: +steps[1], f: +steps[2], o: +steps[3], wc: +steps[4], cc: +steps[5] },
+        tl: (Array.isArray(a[9]) ? a[9].slice(0, 10) : []).map(function (e) {
+          e = Array.isArray(e) ? e : [];
+          return { t: int(e[0], EVENT_TYPES.length - 1), d: str(e[1], 20), r: e[2] === 1 ? 1 : 0 };
+        }),
+        demo: a[10] === 1 ? 1 : 0
+      };
+    } catch (e) { return null; }
+  }
+  function currentBase() {
+    if (location.protocol === 'file:' || location.origin === 'null') return location.href.split('#')[0].split('?')[0];
+    return location.origin + location.pathname;
+  }
+  function normalizeBase(v) {
+    var u = new URL(v);
+    if (u.protocol !== 'https:' && u.protocol !== 'http:') throw new Error('protocol');
+    var path = u.pathname;
+    if (!/\.html?$/i.test(path) && !/\/$/.test(path)) path += '/';
+    return u.origin + path;
+  }
+  function baseURL() { return settings.publicBase || currentBase(); }
+  function publicURL(b, withSnapshot) {
+    var url = baseURL() + '?batch=' + encodeURIComponent(b.id);
+    if (withSnapshot) url += '&d=' + b64urlEncode(JSON.stringify(encodeSnapshot(publicView(b))));
+    return url;
+  }
+  function isLocalBase(u) {
+    try {
+      var x = new URL(u);
+      return x.protocol === 'file:' || /^(localhost|127\.|0\.0\.0\.0|\[::1\]|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(x.hostname);
+    } catch (e) { return true; }
+  }
+
+  /* ---------- UI helpers ---------- */
+  var main = document.getElementById('main');
+  function toast(msg) {
+    var box = document.getElementById('toast');
+    box.innerHTML = '<div class="msg">' + esc(msg) + '</div>';
+    clearTimeout(toast.t);
+    toast.t = setTimeout(function () { box.innerHTML = ''; }, 3200);
+  }
+  function badge(status) { return '<span class="badge ' + (STATUS_CLASS[status] || 'b-draft') + '">' + esc(status) + '</span>'; }
+  function exampleBadge(b) { return b.demo ? ' <span class="badge b-example">' + esc(b.demo) + '</span>' : ''; }
+  function demoBanner() { return '<div class="demo-banner" role="note">' + TXT.DEMO + '</div>'; }
+  function reviewNotice() { return '<div class="notice n-review" role="note">' + esc(TXT.REVIEW) + '</div>'; }
+  function setNav(view) {
+    document.querySelectorAll('[data-nav]').forEach(function (b) {
+      if (b.getAttribute('data-nav') === view) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+    });
+  }
+  function go(hash) { if (location.hash === hash) route(); else location.hash = hash; }
+  function formError(box, msg) { box.innerHTML = '<div class="notice n-stop" role="alert">' + esc(msg) + '</div>'; box.scrollIntoView({ block: 'nearest' }); }
+  function formValues(form) {
+    var out = {};
+    Array.prototype.forEach.call(form.elements, function (el) {
+      if (!el.name || el.disabled) return;
+      out[el.name] = el.type === 'checkbox' ? el.checked : String(el.value || '').trim();
+    });
+    return out;
+  }
+  function anyClaim(o) { return Object.keys(o).some(function (k) { return typeof o[k] === 'string' && hasClaim(o[k]); }); }
+  function fieldHTML(prefix, f, val) {
+    var id = prefix + '_' + f.k, req = f.req ? ' required aria-required="true"' : '';
+    var ph = f.ph ? ' placeholder="' + esc(f.ph) + '"' : '';
+    var desc = f.hint ? ' aria-describedby="' + id + '_h"' : '';
+    var c;
+    if (f.type === 'select') {
+      c = '<select id="' + id + '" name="' + f.k + '"' + req + desc + '>' + f.opts.map(function (o) {
+        return '<option value="' + esc(o[0]) + '"' + (String(val || '') === o[0] ? ' selected' : '') + '>' + esc(o[1]) + '</option>';
+      }).join('') + '</select>';
+    } else if (f.type === 'textarea') {
+      c = '<textarea id="' + id + '" name="' + f.k + '"' + req + desc + ph + '>' + esc(val || '') + '</textarea>';
+    } else {
+      c = '<input type="' + f.type + '" id="' + id + '" name="' + f.k + '" value="' + esc(val || '') + '"' + req + desc + ph + '>';
+    }
+    return '<div class="field"><label for="' + id + '">' + esc(f.label) + (f.req ? ' <span class="req" aria-hidden="true">*</span>' : '') + '</label>' + c +
+      (f.hint ? '<span class="hint" id="' + id + '_h">' + esc(f.hint) + '</span>' : '') + '</div>';
+  }
+
+  /* ---------- Router ---------- */
+  function route() {
+    if (PUBLIC_MODE) { renderPublic(); return; }
+    var parts = location.hash.replace(/^#\/?/, '').split('/');
+    var view = parts[0] || 'dashboard', arg = parts[1] ? decodeURIComponent(parts[1]) : '';
+    setNav(view === 'batch' || view === 'edit' ? '' : view);
+    if (view === 'register') viewForm(null);
+    else if (view === 'edit') viewForm(getBatch(arg), arg);
+    else if (view === 'batch') viewBatch(arg);
+    else if (view === 'public') viewPublicList();
+    else if (view === 'settings') viewSettings();
+    else { setNav('dashboard'); viewDashboard(); }
+    document.title = TITLE;
+  }
+
+  /* ---------- Dashboard ---------- */
+  function viewDashboard() {
+    var rows = allBatches().map(function (b) { return { b: b, ev: evaluate(b) }; });
+    var count = function (list) { return rows.filter(function (x) { return list.indexOf(x.ev.status) >= 0; }).length; };
+    var html = '<div class="page-head"><div><h1>Dashboard</h1><p class="muted">Lettuce batches and their process-review status.</p></div>' +
+      '<button type="button" class="btn" data-nav="register">Register batch</button></div>';
+    if (rows.some(function (x) { return x.b.demo; })) html += demoBanner();
+    html += reviewNotice();
+    html += '<div class="stats">' +
+      stat('s-total', rows.length, 'Total batches') +
+      stat('s-incomplete', count([S.DRAFT, S.INCOMPLETE]), 'Incomplete batches') +
+      stat('s-review', count([S.AWAITING, S.COMPLETE]), 'Batches awaiting review') +
+      stat('s-hold', count([S.HOLD]), 'Batches on hold') + '</div>';
+    if (rows.length) {
+      html += '<h2 id="rH">Recently updated</h2><div class="recent" aria-labelledby="rH">' + rows.slice(0, 4).map(function (x) {
+        return '<a href="#/batch/' + encodeURIComponent(x.b.id) + '"><span class="id">' + esc(x.b.id) + '</span>' + badge(x.ev.status) + '<span class="when">' + esc(fmtStamp(x.b.updatedAt)) + '</span></a>';
+      }).join('') + '</div>';
+    }
+    html += '<section class="panel" aria-labelledby="bH"><h2 id="bH">All batches</h2>' +
+      '<div class="cols"><div class="field"><label for="dashQ">Search by batch ID</label><input type="search" id="dashQ" placeholder="LETTUCE-" value="' + esc(dash.q) + '" autocomplete="off"></div>' +
+      '<div class="field"><label for="dashS">Filter by status</label><select id="dashS"><option value="">All statuses</option>' +
+      STATUS_LIST.map(function (s) { return '<option' + (dash.status === s ? ' selected' : '') + '>' + esc(s) + '</option>'; }).join('') + '</select></div></div>' +
+      '<div id="batchTable"></div></section>';
+    main.innerHTML = html;
+    renderTable();
+    document.getElementById('dashQ').addEventListener('input', function (e) { dash.q = e.target.value; renderTable(); });
+    document.getElementById('dashS').addEventListener('change', function (e) { dash.status = e.target.value; renderTable(); });
+  }
+  function stat(cls, n, label) { return '<div class="stat ' + cls + '"><div class="n">' + n + '</div><div class="l">' + esc(label) + '</div></div>'; }
+  function renderTable() {
+    var box = document.getElementById('batchTable');
+    if (!box) return;
+    var q = dash.q.trim().toUpperCase();
+    var rows = allBatches().map(function (b) { return { b: b, ev: evaluate(b) }; }).filter(function (x) {
+      return (!dash.status || x.ev.status === dash.status) && (!q || x.b.id.indexOf(q) >= 0);
+    });
+    if (!rows.length) {
+      box.innerHTML = state.batches && Object.keys(state.batches).length
+        ? '<p class="muted">No batches match this search or filter.</p>'
+        : '<p>No batches yet.</p><button type="button" class="btn" data-nav="register">Register batch</button>';
+      return;
+    }
+    box.innerHTML = '<table class="cards"><thead><tr><th scope="col">Batch ID</th><th scope="col">Crop</th><th scope="col">Region</th><th scope="col">Harvest date</th><th scope="col">Status</th><th scope="col">Missing</th><th scope="col">Last updated</th><th scope="col"><span class="sr">Actions</span></th></tr></thead><tbody>' +
+      rows.map(function (x) {
+        var b = x.b, id = esc(b.id);
+        return '<tr><td data-label="Batch ID"><span class="id">' + id + '</span>' + (b.demo ? '<div>' + exampleBadge(b) + '</div>' : '') + '</td>' +
+          '<td data-label="Crop">' + esc(shown(b.crop)) + '</td>' +
+          '<td data-label="Region">' + esc(shown(b.region)) + '</td>' +
+          '<td data-label="Harvest date">' + esc(shown(b.harvestDate)) + '</td>' +
+          '<td data-label="Status">' + badge(x.ev.status) + '</td>' +
+          '<td data-label="Missing">' + x.ev.missingCount + '</td>' +
+          '<td data-label="Last updated">' + esc(fmtStamp(b.updatedAt)) + '</td>' +
+          '<td data-label="Actions" class="t-actions"><div class="actions">' +
+            '<button type="button" class="btn btn-sm" data-act="view" data-id="' + id + '">View record</button>' +
+            '<button type="button" class="btn btn-sm btn-alt" data-act="edit" data-id="' + id + '">Edit</button>' +
+            '<button type="button" class="btn btn-sm btn-alt" data-act="qr" data-id="' + id + '">Generate QR</button>' +
+          '</div></td></tr>';
+      }).join('') + '</tbody></table>';
+  }
+
+  /* ---------- Register / edit batch ---------- */
+  function viewForm(b, missingId) {
+    var editing = !!b;
+    if (missingId && !b) { notFound(missingId); return; }
+    var head = '<div class="page-head"><div><h1>' + (editing ? 'Edit batch' : 'Register batch') + '</h1>' +
+      (editing ? '<p class="id">' + esc(b.id) + '</p>' : '<p class="muted">Fields marked * are required.</p>') + '</div></div>';
+    if (role !== 'operator') {
+      main.innerHTML = head + '<div class="notice n-info">Switch the demo role to Operator to ' + (editing ? 'edit' : 'register') + ' batches.</div>';
+      return;
+    }
+    var v = b || {};
+    var f = function (name, label, type, o) {
+      o = o || {};
+      return fieldHTML('reg', { k: name, label: label, type: type, req: o.req, ph: o.ph, hint: o.hint }, v[name]);
+    };
+    var html = head + (editing && b.demo ? demoBanner() : '') + '<form class="panel" data-form="batch" novalidate><div class="form-error" id="regErr"></div>';
+    html += '<fieldset><legend>Batch</legend><div class="cols">' +
+      (editing
+        ? '<div class="field"><label for="reg_id">Batch ID</label><input type="text" id="reg_id" value="' + esc(b.id) + '" disabled aria-describedby="reg_id_h"><span class="hint" id="reg_id_h">Batch IDs cannot be changed, so existing QR codes keep working.</span></div>'
+        : f('id', 'Batch ID', 'text', { ph: 'LETTUCE-YYYYMMDD-XXXX', hint: 'Leave blank to create one from the harvest date.' })) +
+      f('producer', 'Farm or producer name', 'text', { req: true, hint: 'Not shown on public records.' }) +
+      f('region', 'Region', 'text', { req: true }) + f('country', 'Country', 'text', { req: true }) +
+      '</div></fieldset>';
+    html += '<fieldset><legend>Crop and harvest</legend><div class="cols">' +
+      f('crop', 'Crop', 'text', { req: true, ph: 'e.g. Iceberg lettuce' }) + f('variety', 'Variety', 'text') +
+      f('harvestDate', 'Harvest date', 'date', { req: true }) + f('harvestTime', 'Harvest time (optional)', 'time') +
+      f('block', 'Field or block (optional)', 'text') + f('quantity', 'Quantity (optional)', 'text', { ph: 'e.g. 1,200 kg' }) +
+      '</div></fieldset>';
+    html += '<fieldset><legend>Record</legend><div class="cols">' + f('enteredBy', 'Entered by', 'text', { req: true }) + '</div>' +
+      f('notes', 'Notes', 'textarea', { hint: 'Private. Not shown on public records.' }) +
+      '<div class="check"><input type="checkbox" id="reg_ozone" name="ozonePlanned"' + (v.ozonePlanned ? ' checked' : '') + '><label for="reg_ozone">This batch uses ozone treatment of process water</label></div>' +
+      '</fieldset>';
+    html += '<div class="actions"><button type="submit" class="btn">' + (editing ? 'Save changes' : 'Register batch') + '</button>' +
+      '<a class="btn btn-alt" href="' + (editing ? '#/batch/' + encodeURIComponent(b.id) : '#/dashboard') + '">Cancel</a></div></form>';
+    main.innerHTML = html;
+    var form = main.querySelector('form[data-form="batch"]');
+    form.addEventListener('submit', function (e) { e.preventDefault(); submitBatch(form, b); });
+  }
+  function submitBatch(form, b) {
+    var v = formValues(form), err = document.getElementById('regErr');
+    var need = [['producer', 'farm or producer name'], ['region', 'region'], ['country', 'country'], ['crop', 'crop'], ['harvestDate', 'harvest date'], ['enteredBy', 'entered by']]
+      .filter(function (p) { return !v[p[0]]; }).map(function (p) { return p[1]; });
+    if (need.length) { formError(err, 'Fill in: ' + need.join(', ') + '.'); return; }
+    if (anyClaim(v)) { formError(err, TXT.CLAIM); return; }
+    var keys = ['producer', 'region', 'country', 'crop', 'variety', 'harvestDate', 'harvestTime', 'block', 'quantity', 'enteredBy', 'notes'];
+    if (b) {
+      keys.forEach(function (k) { b[k] = v[k] || ''; });
+      b.ozonePlanned = !!v.ozonePlanned;
+      touchRecords(b);
+      log(b.id, 'Edited batch details');
+      save(); toast('Batch saved');
+      go('#/batch/' + encodeURIComponent(b.id));
+      return;
+    }
+    var id = (v.id || '').toUpperCase();
+    if (id) {
+      if (!ID_RE.test(id)) { formError(err, 'Batch ID can use letters, numbers and hyphens (3–40 characters).'); return; }
+      if (state.batches[id]) { formError(err, 'Batch ID ' + id + ' already exists. Use a different ID.'); return; }
+    } else id = newId(v.harvestDate);
+    var t = nowISO(), nb = { id: id, demo: '', ozonePlanned: !!v.ozonePlanned, harvestReview: 'pending', createdAt: t, updatedAt: t, recordsUpdatedAt: t, records: {}, readings: [], events: [], review: [] };
+    keys.forEach(function (k) { nb[k] = v[k] || ''; });
+    state.batches[id] = nb;
+    log(id, 'Registered batch');
+    save(); toast('Batch registered');
+    go('#/batch/' + encodeURIComponent(id));
+  }
+  function newId(date) {
+    var day = (/^\d{4}-\d{2}-\d{2}$/.test(date || '') ? date : todayLocal()).replace(/-/g, '');
+    var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    for (var n = 0; n < 500; n++) {
+      var a = new Uint32Array(4), s = '';
+      try { crypto.getRandomValues(a); } catch (e) { for (var j = 0; j < 4; j++) a[j] = Math.floor(Math.random() * 1e9); }
+      for (var i = 0; i < 4; i++) s += chars.charAt(a[i] % chars.length);
+      var id = 'LETTUCE-' + day + '-' + s;
+      if (!state.batches[id]) return id;
+    }
+    return 'LETTUCE-' + day + '-' + Date.now().toString(36).toUpperCase().slice(-4);
+  }
+
+  /* ---------- Batch record ---------- */
+  function notFound(id) {
+    main.innerHTML = '<div class="panel"><h1>Batch not found</h1><p>No batch with ID <span class="id">' + esc(id) + '</span> is stored here.</p><a class="btn" href="#/dashboard">Back to dashboard</a></div>';
+  }
+  function viewBatch(id) {
+    var b = getBatch(id);
+    if (!b) { notFound(id); return; }
+    var ev = evaluate(b), op = role === 'operator', rv = role === 'reviewer', eid = esc(b.id);
+    var html = '';
+    if (b.demo) html += demoBanner();
+    html += '<section class="panel batch-head" aria-labelledby="bid">' +
+      '<div class="actions" style="justify-content:space-between;align-items:flex-start">' +
+        '<div><h1 class="batch-id id" id="bid">' + eid + '</h1><div class="actions" style="margin-top:8px">' + badge(ev.status) + exampleBadge(b) + '</div></div>' +
+        '<div class="actions">' +
+          (op ? '<a class="btn btn-alt btn-sm" href="#/edit/' + encodeURIComponent(b.id) + '">Edit</a>' : '') +
+          '<button type="button" class="btn btn-sm" data-act="qr" data-id="' + eid + '">Generate QR</button>' +
+          '<a class="btn btn-alt btn-sm" target="_blank" rel="noopener" href="' + esc(publicURL(b, true)) + '">Open public record</a>' +
+          '<button type="button" class="btn btn-alt btn-sm" data-act="export" data-id="' + eid + '">Export JSON</button>' +
+          (op ? '<button type="button" class="btn btn-hold btn-sm" data-act="delete" data-id="' + eid + '">Delete</button>' : '') +
+        '</div></div>' +
+      '<dl class="meta">' +
+        '<div><dt>Crop</dt><dd>' + esc(shown([b.crop, b.variety].filter(Boolean).join(', '))) + '</dd></div>' +
+        '<div><dt>Region and country</dt><dd>' + esc(shown(regionText(b))) + '</dd></div>' +
+        '<div><dt>Harvest</dt><dd>' + esc(shown([b.harvestDate, b.harvestTime].filter(Boolean).join(' '))) + '</dd></div>' +
+        '<div><dt>Missing information</dt><dd>' + ev.missingCount + '</dd></div>' +
+        '<div><dt>Last updated</dt><dd>' + esc(fmtStamp(b.updatedAt)) + '</dd></div>' +
+      '</dl>' + stripHTML(b, ev) + '</section>';
+    html += reviewNotice();
+    html += flagsHTML(ev);
+    html += '<div class="grid-main"><div>';
+    html += '<h2>Process records</h2>';
+    SECTIONS.slice(0, 4).forEach(function (d) { html += sectionHTML(b, ev, d, op); });
+    html += readingsHTML(b, op);
+    SECTIONS.slice(4).forEach(function (d) { html += sectionHTML(b, ev, d, op); });
+    html += eventsHTML(b, op, rv);
+    html += detailsHTML(b);
+    html += '</div><aside>' + reviewHTML(b, ev, rv) + activityHTML(b) + '</aside></div>';
+    main.innerHTML = html;
+    bindBatch(b);
+  }
+  function stripHTML(b, ev) {
+    return '<ol class="strip" aria-label="Process records">' + STRIP.map(function (k, i) {
+      var s = sectionState(b, ev, k);
+      return '<li class="st-' + s.cls + '"><span class="dot" aria-hidden="true">' + (i + 1) + '</span><span class="name">' + esc(SEC[k].short) + '</span><span class="state">' + esc(s.text) + '</span></li>';
+    }).join('') + '</ol>';
+  }
+  function flagsHTML(ev) {
+    var holds = ev.flags.filter(function (f) { return f.type === 'hold'; });
+    var missing = ev.flags.filter(function (f) { return f.type === 'missing' || f.type === 'unknown'; });
+    var review = ev.flags.filter(function (f) { return f.type === 'review'; });
+    var li = function (list) { return '<ul>' + list.map(function (f) { return '<li>' + esc(f.text) + '</li>'; }).join('') + '</ul>'; };
+    var html = ev.flags.length ? '<p class="small muted" style="margin:0 0 8px">' + esc(TXT.CHECKS) + '</p>' : '';
+    if (holds.length) html += '<div class="notice n-stop" role="alert"><strong>Hold—review required</strong>' + li(holds) + '</div>';
+    if (missing.length) html += '<div class="notice n-warn" role="alert"><strong>' + missing.length + ' item' + (missing.length === 1 ? '' : 's') + ' missing information</strong>' + li(missing) + '</div>';
+    if (review.length) html += '<div class="notice n-info"><strong>Needs review</strong>' + li(review) + '</div>';
+    return html;
+  }
+  function sectionHTML(b, ev, d, op) {
+    var rec = (b.records || {})[d.key], s = sectionState(b, ev, d.key);
+    var open = ui.open[d.key] || ui.editing[d.key] ? ' open' : '';
+    var html = '<details class="sec" data-sec="' + d.key + '"' + open + '><summary><span class="t">' + esc(d.title) + '</span><span class="sstate ' + s.cls + '">' + esc(s.text) + '</span></summary><div class="body">';
+    if (d.note) html += '<p class="note-line">' + esc(TXT[d.note]) + '</p>';
+    if (ui.editing[d.key] && op) {
+      html += '<form data-form="section" data-key="' + d.key + '" novalidate><div class="form-error"></div><div class="cols">' +
+        d.fields.map(function (f) { return fieldHTML('s_' + d.key, f, rec ? rec[f.k] : ''); }).join('') +
+        '</div><div class="actions"><button type="submit" class="btn">Save</button><button type="button" class="btn btn-alt" data-act="cancel-edit" data-key="' + d.key + '">Cancel</button></div></form>';
+    } else {
+      if (rec) {
+        html += '<dl class="kv">' + d.fields.map(function (f) {
+          var val = rec[f.k];
+          var disp = f.type === 'select' ? (val ? optLabel(f, val) : '') : (f.type === 'datetime-local' ? fmtLocal(val) : val);
+          return '<dt>' + esc(f.label) + '</dt><dd>' + esc(shown(disp)) + '</dd>';
+        }).join('') + '</dl><p class="saved">Saved ' + esc(fmtStamp(rec.savedAt)) + ' by ' + esc(rec.savedBy || 'Not recorded') + '</p>';
+      } else html += '<p class="muted">Not recorded.</p>';
+      if (op) html += '<button type="button" class="btn btn-alt btn-sm" data-act="edit-sec" data-key="' + d.key + '">' + (rec ? 'Edit' : 'Add record') + '</button>';
+    }
+    return html + '</div></details>';
+  }
+  function readingsHTML(b, op) {
+    var list = b.readings || [];
+    var open = ui.open.readings || ui.editing.readings ? ' open' : '';
+    var html = '<details class="sec" data-sec="readings"' + open + '><summary><span class="t">Water-quality readings</span><span class="sstate">' + list.length + ' reading' + (list.length === 1 ? '' : 's') + '</span></summary><div class="body">';
+    html += '<p class="note-line">' + esc(TXT.READINGS) + '</p>';
+    if (list.length) {
+      html += '<div class="table-wrap"><table class="cards"><thead><tr>' + READING_COLS.map(function (c) { return '<th scope="col">' + c[1] + '</th>'; }).join('') + (op ? '<th scope="col"><span class="sr">Remove</span></th>' : '') + '</tr></thead><tbody>' +
+        list.map(function (m) {
+          return '<tr>' + READING_COLS.map(function (c) { return '<td data-label="' + c[1] + '">' + esc(shown(c[0] === 'time' ? fmtLocal(m.time) : m[c[0]])) + '</td>'; }).join('') +
+            (op ? '<td data-label=""><button type="button" class="btn btn-alt btn-sm" data-act="del-reading" data-rid="' + esc(m.id) + '">Remove</button></td>' : '') + '</tr>';
+        }).join('') + '</tbody></table></div>';
+    } else html += '<p class="muted">No readings recorded.</p>';
+    if (op) {
+      if (ui.editing.readings) {
+        html += '<form data-form="reading" novalidate style="margin-top:12px"><div class="form-error"></div><div class="cols">' +
+          READING_FIELDS.map(function (f) { return fieldHTML('rd', f, ''); }).join('') +
+          '</div><div class="actions"><button type="submit" class="btn">Save reading</button><button type="button" class="btn btn-alt" data-act="cancel-edit" data-key="readings">Cancel</button></div></form>';
+      } else html += '<button type="button" class="btn btn-alt btn-sm" data-act="edit-sec" data-key="readings" style="margin-top:10px">Add reading</button>';
+    }
+    return html + '</div></details>';
+  }
+  function eventsHTML(b, op, rv) {
+    var list = timeline(b);
+    var open = ui.open.events || ui.editing.events ? ' open' : '';
+    var html = '<details class="sec" data-sec="events"' + open + '><summary><span class="t">Traceability events</span><span class="sstate">' + list.length + ' event' + (list.length === 1 ? '' : 's') + '</span></summary><div class="body">';
+    if (!list.length) html += '<p class="muted">No events yet. Harvest appears here once a harvest date is saved.</p>';
+    else html += '<ol class="tl">' + list.map(function (e) {
+      var btns = '';
+      if (rv && e.review !== 'complete') btns += '<button type="button" class="btn btn-alt btn-sm" data-act="event-review" data-eid="' + esc(e.id) + '">Mark reviewed</button>';
+      if (op && !e.fixed) btns += '<button type="button" class="btn btn-alt btn-sm" data-act="del-event" data-eid="' + esc(e.id) + '">Remove</button>';
+      return '<li><div class="ev">' + esc(e.type) + ' <span class="muted small">' + esc(fmtLocal(e.when)) + '</span></div>' +
+        '<div class="small">' + esc(shown(e.what)) + '</div>' +
+        '<div class="small muted">' + esc(shown(e.where)) + (e.who ? ', recorded by ' + esc(e.who) : '') + '. ' + (e.review === 'complete' ? 'Review complete' : 'Review pending') + '</div>' +
+        (btns ? '<div class="actions" style="margin-top:6px">' + btns + '</div>' : '') + '</li>';
+    }).join('') + '</ol>';
+    if (op) {
+      if (ui.editing.events) {
+        html += '<form data-form="event" novalidate style="margin-top:12px"><div class="form-error"></div><div class="cols">' +
+          fieldHTML('ev', { k: 'type', label: 'Event', type: 'select', req: true, opts: [['', 'Select']].concat(EVENT_TYPES.slice(1).map(function (t) { return [t, t]; })) }, '') +
+          fieldHTML('ev', { k: 'what', label: 'What happened', type: 'text', req: true }, '') +
+          fieldHTML('ev', { k: 'who', label: 'Recorded by (role)', type: 'text', req: true }, '') +
+          fieldHTML('ev', { k: 'when', label: 'When', type: 'datetime-local', req: true }, '') +
+          fieldHTML('ev', { k: 'where', label: 'Where (region or facility)', type: 'text', req: true }, '') +
+          '</div><div class="actions"><button type="submit" class="btn">Save event</button><button type="button" class="btn btn-alt" data-act="cancel-edit" data-key="events">Cancel</button></div></form>';
+      } else html += '<button type="button" class="btn btn-alt btn-sm" data-act="edit-sec" data-key="events" style="margin-top:6px">Add event</button>';
+    }
+    return html + '</div></details>';
+  }
+  function detailsHTML(b) {
+    var open = ui.open.details ? ' open' : '';
+    return '<details class="sec" data-sec="details"' + open + '><summary><span class="t">Batch details</span><span class="sstate">Private</span></summary><div class="body"><dl class="kv">' +
+      [['Farm or producer', b.producer], ['Field or block', b.block], ['Quantity', b.quantity], ['Entered by', b.enteredBy], ['Ozone treatment planned', b.ozonePlanned ? 'Yes' : 'No'], ['Notes', b.notes], ['Registered', fmtStamp(b.createdAt)]]
+        .map(function (p) { return '<dt>' + esc(p[0]) + '</dt><dd>' + esc(shown(p[1])) + '</dd>'; }).join('') + '</dl></div></details>';
+  }
+  function reviewHTML(b, ev, rv) {
+    var acts = b.review || [];
+    var html = '<section class="panel" aria-labelledby="revH"><h2 id="revH">Process review</h2>' +
+      '<p>' + badge(ev.status) + '</p>';
+    if (rv) {
+      html += '<form data-form="review" novalidate><div class="form-error" id="revErr"></div>' +
+        '<div class="field"><label for="rv_role">Reviewer role <span class="req" aria-hidden="true">*</span></label><input type="text" id="rv_role" name="reviewerRole" value="Process reviewer"></div>' +
+        '<div class="field"><label for="rv_name">Reviewer name (private)</label><input type="text" id="rv_name" name="reviewerName" autocomplete="name"></div>' +
+        '<div class="field"><label for="rv_note">Review note</label><textarea id="rv_note" name="note" aria-describedby="rv_note_h"></textarea><span class="hint" id="rv_note_h">Required for hold, escalation and disposition. Private.</span></div>' +
+        '<div class="field"><label for="rv_disp">Disposition</label><textarea id="rv_disp" name="disposition" aria-describedby="rv_disp_h"></textarea><span class="hint" id="rv_disp_h">Required for Record disposition. Describe the operational decision.</span></div>';
+      if (ev.flags.length) html += '<div class="check"><input type="checkbox" id="rv_ack" name="ack"><label for="rv_ack">I reviewed the ' + ev.flags.length + ' open item' + (ev.flags.length === 1 ? '' : 's') + ' listed for this batch.</label></div>';
+      html += '<div class="actions" style="margin-top:10px">' +
+        '<button type="button" class="btn btn-alt" data-act="review" data-a="continue">Continue under review</button>' +
+        '<button type="button" class="btn btn-hold" data-act="review" data-a="hold">Place on hold</button>' +
+        '<button type="button" class="btn btn-hold" data-act="review" data-a="escalate">Escalate for investigation</button>' +
+        '<button type="button" class="btn btn-water" data-act="review" data-a="disposition">Record disposition</button></div></form>';
+    } else {
+      html += '<p class="small muted">Switch the demo role to Reviewer to record a review.</p>';
+    }
+    html += '<h3 style="margin-top:16px">Review history</h3>';
+    html += acts.length ? '<ul class="list">' + acts.slice().reverse().map(function (a) {
+      return '<li><div class="grow"><strong>' + esc((ACTIONS[a.action] || {}).done || a.action) + '</strong><div class="small muted">' + esc(fmtStamp(a.time)) + ', ' + esc(a.reviewerRole || 'Reviewer') + (a.reviewerName ? ' (' + esc(a.reviewerName) + ')' : '') + '</div>' +
+        (a.note ? '<div class="small">' + esc(a.note) + '</div>' : '') + (a.disposition ? '<div class="small">Disposition: ' + esc(a.disposition) + '</div>' : '') + '</div></li>';
+    }).join('') + '</ul>' : '<p class="muted small">No review actions yet.</p>';
+    return html + '</section>';
+  }
+  function activityHTML(b) {
+    var acts = state.activity.filter(function (a) { return a.id === b.id; }).slice(0, 8);
+    return '<section class="panel" aria-labelledby="actH"><h2 id="actH">Activity</h2>' + (acts.length ? '<ul class="list">' + acts.map(function (a) {
+      return '<li><div class="grow">' + esc(a.text) + '<div class="small muted">' + esc(fmtStamp(a.t)) + ', ' + esc(a.role) + '</div></div></li>';
+    }).join('') + '</ul>' : '<p class="muted small">No activity yet.</p>') + '</section>';
+  }
+
+  function bindBatch(b) {
+    main.querySelectorAll('details.sec').forEach(function (d) {
+      d.addEventListener('toggle', function () { ui.open[d.getAttribute('data-sec')] = d.open; });
+    });
+    var rerender = function (key, msg) { ui.editing[key] = false; ui.open[key] = true; save(); if (msg) toast(msg); viewBatch(b.id); };
+    main.querySelectorAll('form[data-form="section"]').forEach(function (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var key = form.getAttribute('data-key'), d = SEC[key], v = formValues(form), err = form.querySelector('.form-error');
+        var need = d.fields.filter(function (f) { return f.req && !v[f.k]; }).map(function (f) { return f.label; });
+        if (need.length) { formError(err, 'Fill in: ' + need.join(', ') + '. Choose Unknown if the information is not available.'); return; }
+        if (anyClaim(v)) { formError(err, TXT.CLAIM); return; }
+        v.savedAt = nowISO(); v.savedBy = ROLE_LABEL[role];
+        b.records[key] = v;
+        touchRecords(b);
+        log(b.id, 'Saved ' + d.title.replace(' (optional)', '').toLowerCase());
+        rerender(key, d.title.replace(' (optional)', '') + ' saved');
+      });
+    });
+    var rf = main.querySelector('form[data-form="reading"]');
+    if (rf) rf.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var v = formValues(rf), err = rf.querySelector('.form-error');
+      if (!v.time) { formError(err, 'Fill in: date and time.'); return; }
+      if (anyClaim(v)) { formError(err, TXT.CLAIM); return; }
+      v.id = uid();
+      b.readings.push(v);
+      b.readings.sort(function (x, y) { return String(x.time).localeCompare(String(y.time)); });
+      touchRecords(b);
+      log(b.id, 'Added a water-quality reading');
+      rerender('readings', 'Reading saved');
+    });
+    var ef = main.querySelector('form[data-form="event"]');
+    if (ef) ef.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var v = formValues(ef), err = ef.querySelector('.form-error');
+      if (['type', 'what', 'who', 'when', 'where'].some(function (k) { return !v[k]; })) { formError(err, 'Fill in every event field.'); return; }
+      if (anyClaim(v)) { formError(err, TXT.CLAIM); return; }
+      b.events.push({ id: uid(), type: v.type, what: v.what, who: v.who, when: v.when, where: v.where, review: 'pending' });
+      touchRecords(b);
+      log(b.id, 'Added ' + v.type.toLowerCase() + ' event');
+      rerender('events', 'Event saved');
+    });
+    var first = main.querySelector('form[data-form="section"] select, form[data-form="section"] input, form[data-form="reading"] input, form[data-form="event"] select');
+    if (first) first.focus();
+  }
+
+  function recordReview(b, action) {
+    var form = main.querySelector('form[data-form="review"]');
+    if (!form || role !== 'reviewer') return;
+    var v = formValues(form), err = document.getElementById('revErr'), ev = evaluate(b);
+    if (!v.reviewerRole) { formError(err, 'Fill in: reviewer role.'); return; }
+    if (action !== 'continue' && !v.note) { formError(err, 'Add a review note for this action.'); return; }
+    if (action === 'disposition') {
+      if (!v.disposition) { formError(err, 'Describe the disposition.'); return; }
+      if (ev.flags.length && !v.ack) { formError(err, 'Confirm that you reviewed the open items.'); return; }
+    }
+    if (anyClaim(v)) { formError(err, TXT.CLAIM); return; }
+    b.review.push({ id: uid(), action: action, reviewerRole: v.reviewerRole, reviewerName: v.reviewerName || '', note: v.note || '',
+      disposition: action === 'disposition' ? v.disposition : '', time: nowISO(), openItems: ev.flags.length });
+    b.updatedAt = nowISO();
+    log(b.id, ACTIONS[action].done);
+    save(); toast(ACTIONS[action].done);
+    viewBatch(b.id);
+  }
+
+  /* ---------- QR dialog ---------- */
+  var lastFocus = null, qrState = null;
+  function openQR(id) {
+    var b = getBatch(id);
+    if (!b) return;
+    lastFocus = document.activeElement;
+    qrState = { b: b, snap: true };
+    drawQR();
+    var m = document.querySelector('#modalRoot .modal');
+    if (m) m.focus();
+  }
+  function drawQR() {
+    var b = qrState.b, url = publicURL(b, qrState.snap), root = document.getElementById('modalRoot');
+    var svg = '', qrErr = '';
+    try {
+      var code = QR.encode(url);
+      var cell = Math.max(3, Math.floor(300 / (code.size + 8)));
+      svg = QR.toSvg(code, cell, 'QR code for ' + esc(b.id));
+      qrState.code = code;
+    } catch (e) { qrErr = 'The QR code could not be created. Use the link below.'; qrState.code = null; }
+    qrState.url = url; qrState.svg = svg;
+    var local = isLocalBase(url);
+    root.innerHTML = '<div class="overlay" data-act="overlay"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="qrT" tabindex="-1">' +
+      '<div class="actions" style="justify-content:space-between"><h2 id="qrT" style="margin:0">QR code</h2><button type="button" class="btn btn-alt btn-sm" data-act="close">Close</button></div>' +
+      '<p class="id" style="margin:6px 0 10px">' + esc(b.id) + '</p>' +
+      (b.demo ? '<div class="demo-banner" role="note">' + TXT.DEMO + '</div>' : '') +
+      (local ? '<div class="notice n-warn" role="note">This link only opens on this computer. Add a public base URL in Settings to scan from a phone.</div>' : '') +
+      '<div class="check"><input type="checkbox" id="qrSnap"' + (qrState.snap ? ' checked' : '') + '><label for="qrSnap">Include public snapshot in the link<span class="hint" style="display:block;font-weight:400">Opens on any phone. Private notes, names and internal comments are never included.</span></label></div>' +
+      (svg ? '<div class="qr-box">' + svg + '</div>' : '<div class="notice n-stop" role="alert">' + esc(qrErr) + '</div>') +
+      '<div class="field"><span class="lbl" id="qrLinkL">Public link</span><div class="linkbox" id="qrLink" aria-labelledby="qrLinkL">' + esc(url) + '</div></div>' +
+      '<div class="actions">' +
+        '<button type="button" class="btn btn-alt" data-act="copy">Copy link</button>' +
+        '<a class="btn btn-alt" href="' + esc(url) + '" target="_blank" rel="noopener">Open public record</a>' +
+        (svg ? '<button type="button" class="btn btn-alt" data-act="print-qr">Print</button><button type="button" class="btn" data-act="download-qr">Download QR</button>' : '') +
+      '</div></div></div>';
+    document.getElementById('qrSnap').addEventListener('change', function (e) {
+      qrState.snap = e.target.checked; drawQR();
+      var cb = document.getElementById('qrSnap'); if (cb) cb.focus();
+    });
+  }
+  function closeModal() {
+    document.getElementById('modalRoot').innerHTML = '';
+    qrState = null;
+    if (lastFocus && document.body.contains(lastFocus)) lastFocus.focus();
+  }
+  function printQR() {
+    var area = document.getElementById('printArea');
+    area.innerHTML = '<div style="font:700 22px/1.3 sans-serif">AgüitaTech</div><div style="font:14px/1.3 sans-serif">Lettuce for Vegetables traceability</div><div style="font:600 18px/1.4 sans-serif;margin:8px 0 14px">' + esc(qrState.b.id) + '</div>' +
+      qrState.svg + '<div style="font:12px/1.4 monospace;margin-top:12px;word-break:break-all">' + esc(qrState.url) + '</div>';
+    document.body.classList.add('printing-qr');
+    var done = function () { document.body.classList.remove('printing-qr'); area.innerHTML = ''; window.removeEventListener('afterprint', done); };
+    window.addEventListener('afterprint', done);
+    window.print();
+  }
+
+  /* ---------- Public record page ---------- */
+  function renderPublic() {
+    document.body.classList.add('public-mode');
+    var id = String(params.get('batch') || '').trim().toUpperCase().slice(0, 40);
+    var d = params.get('d');
+    var b = ID_RE.test(id) ? getBatch(id) : null;
+    var snap = d ? decodeSnapshot(d, id) : null;
+    var v = null, source = '';
+    // Use this browser's record unless the link carries a newer snapshot.
+    var dev = b && fromStorage ? b : null;
+    if (dev && snap && (Date.parse(snap.lu) || 0) > (Date.parse(dev.updatedAt) || 0)) dev = null;
+    if (dev) { v = publicView(dev); source = 'device'; }
+    else if (snap) { v = snap; source = 'snapshot'; }
+    else if (b) { v = publicView(b); source = 'builtin'; }
+    var html = '<div class="pub">';
+    if (!v) {
+      html += '<div class="panel"><h1>Record not found</h1><p>No public record for <span class="id">' + esc(id || 'this link') + '</span> is available on this device.</p>' +
+        '<p class="muted">Ask for a QR code that includes a public snapshot.</p></div><div class="notice n-public" role="note">' + esc(TXT.NOTICE) + '</div></div>';
+      main.innerHTML = html;
+      return;
+    }
+    if (v.demo) html += demoBanner();
+    html += '<div class="notice n-public" role="note">' + esc(TXT.NOTICE) + '</div>';
+    html += '<section class="pub-head" aria-labelledby="pubId"><p class="k">AgüitaTech traceability record</p><h1 class="batch-id id" id="pubId">' + esc(v.id) + '</h1><dl>' +
+      '<div><dt>Crop</dt><dd>' + esc(shown([scrub(v.cr), scrub(v.va)].filter(Boolean).join(', '))) + '</dd></div>' +
+      '<div><dt>Region and country</dt><dd>' + esc(shown([scrub(v.rg), scrub(v.co)].filter(Boolean).join(', '))) + '</dd></div>' +
+      '<div><dt>Harvest date</dt><dd>' + esc(shown(v.hd)) + '</dd></div>' +
+      '<div><dt>Last updated</dt><dd>' + esc(fmtStamp(v.lu)) + '</dd></div></dl></section>';
+    html += '<section class="panel" aria-labelledby="psH"><h2 id="psH">Process-review status</h2><p><span class="badge ' + PUB_CLASS[v.st] + '">' + esc(PUB_LABEL[v.st]) + '</span></p>' +
+      '<h3 style="margin-top:16px">Process records</h3><ul class="pub-rows">' + [
+        ['Water assessment', REC_L[v.tr.w]], ['Pretreatment', USED_L[v.tr.p]], ['Filtration', USED_L[v.tr.f]],
+        ['Ozone process-water treatment', USED_L[v.tr.o]], ['Washing or cooling', DONE_L[v.tr.wc]], ['Cold-chain and quality record', REC_L[v.tr.cc]]
+      ].map(function (r) { return '<li><span>' + r[0] + '</span><span class="v">' + r[1] + '</span></li>'; }).join('') + '</ul>' +
+      '<p class="small muted" style="margin-top:10px">' + esc(TXT.PUBLIC_STEPS) + '</p></section>';
+    html += '<section class="panel" aria-labelledby="ptH"><h2 id="ptH">Process timeline</h2>' + (v.tl.length ? '<ol class="tl">' + v.tl.map(function (e) {
+      return '<li><div class="ev">' + esc(EVENT_TYPES[e.t] || 'Event') + ' <span class="muted small">' + esc(shown(fmtLocal(e.d))) + '</span></div><div class="small muted">' + (e.r ? 'Review complete' : 'Review pending') + '</div></li>';
+    }).join('') + '</ol>' : '<p class="muted">Not recorded.</p>') + '</section>';
+    html += reviewNotice();
+    if (source === 'snapshot') html += '<p class="small muted">Snapshot from the QR link' + (v.g ? ', created ' + esc(fmtStamp(v.g)) : '') + '. It does not show later changes.</p>';
+    html += '<div class="actions no-print"><button type="button" class="btn btn-alt" data-act="print-page">Print public record</button></div></div>';
+    main.innerHTML = html;
+  }
+
+  /* ---------- Public records list ---------- */
+  function viewPublicList() {
+    var list = allBatches();
+    var html = '<div class="page-head"><div><h1>Public records</h1><p class="muted">What a QR code opens. Private notes and names are not shown.</p></div></div>';
+    if (list.some(function (b) { return b.demo; })) html += demoBanner();
+    html += '<section class="panel">' + (list.length ? '<ul class="list">' + list.map(function (b) {
+      var st = publicKey(evaluate(b).status);
+      return '<li><div class="grow"><span class="id">' + esc(b.id) + '</span><div class="small muted">' + esc(shown(b.crop)) + ', ' + esc(shown(regionText(b))) + '</div><div style="margin-top:4px"><span class="badge ' + PUB_CLASS[st] + '">' + esc(PUB_LABEL[st]) + '</span></div></div>' +
+        '<div class="actions"><a class="btn btn-alt btn-sm" target="_blank" rel="noopener" href="' + esc(publicURL(b, true)) + '">Open public record</a>' +
+        '<button type="button" class="btn btn-sm" data-act="qr" data-id="' + esc(b.id) + '">Generate QR</button></div></li>';
+    }).join('') + '</ul>' : '<p>No batches yet.</p>') + '</section>';
+    main.innerHTML = html;
+  }
+
+  /* ---------- Settings ---------- */
+  function viewSettings() {
+    var html = '<div class="page-head"><div><h1>Settings</h1></div></div>';
+    html += '<section class="panel" aria-labelledby="urlH"><h2 id="urlH">Public base URL</h2>' +
+      '<form data-form="settings" novalidate><div class="form-error" id="setErr"></div><div class="field"><label for="publicBase">Address used in QR links (optional)</label>' +
+      '<input type="url" id="publicBase" name="publicBase" inputmode="url" placeholder="https://" value="' + esc(settings.publicBase) + '" aria-describedby="publicBase_h">' +
+      '<span class="hint" id="publicBase_h">Leave blank to use this page’s address: ' + esc(currentBase()) + '</span></div>' +
+      '<div class="actions"><button type="submit" class="btn">Save</button>' + (settings.publicBase ? '<button type="button" class="btn btn-alt" data-act="clear-base">Use this page’s address</button>' : '') + '</div></form></section>';
+    html += '<section class="panel" aria-labelledby="dataH"><h2 id="dataH">Data</h2><p>' + esc(TXT.STORAGE) + '</p>' +
+      (storageOK ? '' : '<div class="notice n-stop" role="alert">This browser is blocking local storage, so changes will be lost when the page closes.</div>') +
+      '<p class="muted">Reset restores the three demonstration batches and removes all other batches in this browser.</p>' +
+      '<button type="button" class="btn btn-hold" data-act="reset">Reset demonstration data</button></section>';
+    html += '<section class="panel" aria-labelledby="roleH"><h2 id="roleH">Demo role</h2><p>' + esc(TXT.ROLE) + '</p></section>';
+    main.innerHTML = html;
+    main.querySelector('form[data-form="settings"]').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var raw = document.getElementById('publicBase').value.trim(), err = document.getElementById('setErr');
+      if (!raw) { settings.publicBase = ''; }
+      else {
+        try { settings.publicBase = normalizeBase(raw); }
+        catch (x) { formError(err, 'Enter a full web address that starts with https://'); return; }
+      }
+      writeJSON(SETTINGS_KEY, settings);
+      toast('Settings saved');
+      viewSettings();
+    });
+  }
+
+  /* ---------- Events ---------- */
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-act],[data-nav]');
+    if (!t) return;
+    var nav = t.getAttribute('data-nav');
+    if (nav) { go('#/' + nav); return; }
+    var a = t.getAttribute('data-act'), id = t.getAttribute('data-id');
+    var cur = location.hash.indexOf('#/batch/') === 0 ? getBatch(decodeURIComponent(location.hash.slice(8))) : null;
+    switch (a) {
+      case 'view': go('#/batch/' + encodeURIComponent(id)); break;
+      case 'edit': go('#/edit/' + encodeURIComponent(id)); break;
+      case 'qr': openQR(id); break;
+      case 'overlay': if (e.target === t) closeModal(); break;
+      case 'close': closeModal(); break;
+      case 'copy':
+        var done = function () { toast('Link copied'); };
+        if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(qrState.url).then(done, selectLink);
+        else selectLink();
+        break;
+      case 'download-qr':
+        try {
+          var canvas = QR.toCanvas(qrState.code, 10);
+          canvas.toBlob(function (blob) { if (blob) downloadBlob(blob, 'qr-' + qrState.b.id + '.png'); else toast('Download is not available in this browser.'); }, 'image/png');
+        } catch (x) { toast('Download is not available in this browser.'); }
+        break;
+      case 'print-qr': printQR(); break;
+      case 'print-page': window.print(); break;
+      case 'export':
+        var bx = getBatch(id);
+        if (bx) {
+          var ev = evaluate(bx);
+          var data = { exportedAt: nowISO(), simulated: !!bx.demo, status: ev.status, openItems: ev.flags.map(function (f) { return f.text; }), batch: bx };
+          downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }), bx.id + '.json');
+          toast('Record exported');
+        }
+        break;
+      case 'delete':
+        if (role !== 'operator' || !state.batches[id]) return;
+        if (!window.confirm('Delete batch ' + id + '? This cannot be undone.')) return;
+        delete state.batches[id];
+        log(id, 'Deleted batch');
+        save(); toast('Batch deleted');
+        go('#/dashboard');
+        break;
+      case 'edit-sec': if (cur) { ui.editing[t.getAttribute('data-key')] = true; viewBatch(cur.id); } break;
+      case 'cancel-edit': if (cur) { ui.editing[t.getAttribute('data-key')] = false; viewBatch(cur.id); } break;
+      case 'review': if (cur) recordReview(cur, t.getAttribute('data-a')); break;
+      case 'event-review':
+        if (!cur || role !== 'reviewer') return;
+        var eid = t.getAttribute('data-eid');
+        if (eid === 'harvest') cur.harvestReview = 'complete';
+        else cur.events.forEach(function (x) { if (x.id === eid) x.review = 'complete'; });
+        cur.updatedAt = nowISO();
+        log(cur.id, 'Marked an event reviewed');
+        ui.open.events = true; save(); toast('Event marked reviewed'); viewBatch(cur.id);
+        break;
+      case 'del-event':
+      case 'del-reading':
+        if (!cur || role !== 'operator') return;
+        var rid = t.getAttribute(a === 'del-event' ? 'data-eid' : 'data-rid');
+        if (a === 'del-event') { cur.events = cur.events.filter(function (x) { return x.id !== rid; }); ui.open.events = true; log(cur.id, 'Removed an event'); }
+        else { cur.readings = cur.readings.filter(function (x) { return x.id !== rid; }); ui.open.readings = true; log(cur.id, 'Removed a reading'); }
+        touchRecords(cur); save(); toast('Removed'); viewBatch(cur.id);
+        break;
+      case 'clear-base':
+        settings.publicBase = ''; writeJSON(SETTINGS_KEY, settings); toast('Settings saved'); viewSettings();
+        break;
+      case 'reset':
+        if (!window.confirm('Reset demonstration data? All batches in this browser are replaced by the three demonstration batches.')) return;
+        state = seed(); fromStorage = true; ui = { open: {}, editing: {} }; dash = { q: '', status: '' };
+        save(); toast('Demonstration data reset');
+        go('#/dashboard');
+        break;
+    }
+  });
+  function selectLink() {
+    var el = document.getElementById('qrLink');
+    if (!el) return;
+    var r = document.createRange(); r.selectNodeContents(el);
+    var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    toast('Link selected. Press Ctrl+C or Cmd+C to copy.');
+  }
+  document.addEventListener('keydown', function (e) {
+    var root = document.getElementById('modalRoot');
+    if (!root.firstChild) return;
+    if (e.key === 'Escape') { closeModal(); return; }
+    if (e.key === 'Tab') {
+      var f = root.querySelectorAll('a[href], button, input, select, textarea');
+      if (!f.length) return;
+      var first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === root.querySelector('.modal'))) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+  document.getElementById('roleSelect').addEventListener('change', function (e) {
+    role = e.target.value;
+    try { localStorage.setItem(ROLE_KEY, role); } catch (x) { /* role stays for this visit */ }
+    ui.editing = {};
+    toast('Demo role: ' + ROLE_LABEL[role]);
+    route();
+  });
+  window.addEventListener('hashchange', function () { ui.editing = {}; route(); main.focus({ preventScroll: true }); window.scrollTo(0, 0); });
+
+  /* ---------- Start ---------- */
+  try { var r0 = localStorage.getItem(ROLE_KEY); if (ROLE_LABEL[r0]) role = r0; } catch (e) { storageOK = false; }
+  var s0 = readJSON(SETTINGS_KEY);
+  if (s0 && typeof s0.publicBase === 'string') settings.publicBase = s0.publicBase;
+  state = readJSON(DATA_KEY);
+  if (state && state.batches && typeof state.batches === 'object' && Array.isArray(state.activity)) fromStorage = true;
+  else {
+    state = seed();
+    if (!PUBLIC_MODE && writeJSON(DATA_KEY, state)) fromStorage = true;
+  }
+  document.getElementById('roleSelect').value = role;
+  route();
+})();
+</script>
+</body>
+</html>
